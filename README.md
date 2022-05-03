@@ -1,4 +1,4 @@
 video
 pic
 base url:
-https://cdn.jsdelivr.net/gh/wugeyun/open@cache/README.md
+https://cdn.jsdelivr.net/gh/wugeyun/open@main/README.md
