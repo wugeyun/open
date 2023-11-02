@@ -292,7 +292,6 @@
 <script>
 function checkPassword() {
     var passwordEntered = false;
-
     function verifyPassword(password) {
         if (password === "武哥666") {
             sessionStorage.setItem("VIPpassword", password);
@@ -303,10 +302,8 @@ function checkPassword() {
             // 输入错误，继续循环等待新的口令输入
         }
     }
-
     while (!passwordEntered) {
         var savedPassword = sessionStorage.getItem("VIPpassword");
-
         if (savedPassword) {
             verifyPassword(savedPassword);
         } else {
@@ -325,6 +322,5 @@ console.log("防君子不防小人");
 console.log("暗号是: 武哥666");
 console.log("记住了吗");
 </script>
-
 </body>
 </html>
