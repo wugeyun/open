@@ -309,29 +309,33 @@
 <script>
 function checkPassword() {
     var passwordEntered = false;
-    function verifyPassword(password) {
+    function handlePasswordInput(password) {
         if (password === "武哥666") {
             sessionStorage.setItem("VIPpassword", password);
-            // 输入正确，退出循环
             passwordEntered = true;
         } else {
             alert("暗号错误，警告");
-            // 输入错误，继续循环等待新的口令输入
         }
     }
-    while (!passwordEntered) {
-        var savedPassword = sessionStorage.getItem("VIPpassword");
+    function askForPassword() {
+        var savedPassword = getSessionSavedPassword();
         if (savedPassword) {
-            verifyPassword(savedPassword);
+            handlePasswordInput(savedPassword);
         } else {
             var password = prompt("私人场所，请对暗号:");
             if (password) {
-                verifyPassword(password);
+                handlePasswordInput(password);
             } else {
                 // 用户取消输入口令，继续循环提示用户输入
                 alert("请重新核对");
             }
         }
+    }
+    function getSessionSavedPassword() {
+        return sessionStorage.getItem("VIPpassword");
+    }
+    while (!passwordEntered) {
+        askForPassword();
     }
 }
 checkPassword();
