@@ -295,7 +295,7 @@ function checkPassword() {
 
     function verifyPassword(password) {
         if (password === "武哥666") {
-            localStorage.setItem("VIPpassword", password);
+            sessionStorage.setItem("VIPpassword", password);
             // 输入正确，退出循环
             passwordEntered = true;
         } else {
@@ -305,7 +305,7 @@ function checkPassword() {
     }
 
     while (!passwordEntered) {
-        var savedPassword = localStorage.getItem("VIPpassword");
+        var savedPassword = sessionStorage.getItem("VIPpassword");
 
         if (savedPassword) {
             verifyPassword(savedPassword);
