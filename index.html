@@ -289,5 +289,42 @@
             </div>
           </div>
       </main>
+<script>
+function checkPassword() {
+    var passwordEntered = false;
+
+    function verifyPassword(password) {
+        if (password === "武哥666") {
+            localStorage.setItem("VIPpassword", password);
+            // 输入正确，退出循环
+            passwordEntered = true;
+        } else {
+            alert("暗号错误，警告");
+            // 输入错误，继续循环等待新的口令输入
+        }
+    }
+
+    while (!passwordEntered) {
+        var savedPassword = localStorage.getItem("VIPpassword");
+
+        if (savedPassword) {
+            verifyPassword(savedPassword);
+        } else {
+            var password = prompt("私人场所，请对暗号:");
+            if (password) {
+                verifyPassword(password);
+            } else {
+                // 用户取消输入口令，继续循环提示用户输入
+                alert("请重新核对");
+            }
+        }
+    }
+}
+checkPassword();
+console.log("防君子不防小人");
+console.log("暗号是: 武哥666");
+console.log("记住了吗");
+</script>
+
 </body>
 </html>
