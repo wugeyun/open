@@ -309,39 +309,39 @@
 <script>
 function checkPassword() {
     var passwordEntered = false;
-    function handlePasswordInput(password) {
-        if (password === "武哥666") {
-            sessionStorage.setItem("VIPpassword", password);
+    var currentDate = new Date();
+    var month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // 获取月份，并确保是两位数
+    var day = currentDate.getDate().toString().padStart(2, '0'); // 获取日期，并确保是两位数
+    var dateStr = 'wuge' + month + day; // 拼接密码格式为 'wugeMMDD'
+    function verifyPassword(password) {
+        if (password === dateStr) {
+            localStorage.setItem("VIPpassword", password);
+            // 输入正确，退出循环
             passwordEntered = true;
         } else {
             alert("暗号错误，警告");
+            localStorage.removeItem("VIPpassword"); // 输入错误时删除本地存储的密码
+            // 输入错误，继续循环等待新的口令输入
         }
     }
-    function askForPassword() {
-        var savedPassword = getSessionSavedPassword();
+    while (!passwordEntered) {
+        var savedPassword = localStorage.getItem("VIPpassword");
         if (savedPassword) {
-            handlePasswordInput(savedPassword);
+            verifyPassword(savedPassword);
         } else {
             var password = prompt("私人场所，请对暗号:");
             if (password) {
-                handlePasswordInput(password);
+                verifyPassword(password);
             } else {
                 // 用户取消输入口令，继续循环提示用户输入
                 alert("请重新核对");
             }
         }
     }
-    function getSessionSavedPassword() {
-        return sessionStorage.getItem("VIPpassword");
-    }
-    while (!passwordEntered) {
-        askForPassword();
-    }
 }
 checkPassword();
-console.log("防君子不防小人");
-console.log("暗号是: 武哥666");
-console.log("记住了吗");
+console.log("本站防君子不防小人");
+console.log("请添加武哥微信以免失联");
 </script>
 </body>
 </html>
