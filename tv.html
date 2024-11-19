@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        form {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        iframe {
+            width: 100%;
+            max-width: 800px;
+            height: 0;
+            border: none;
+            transition: height 0.3s ease;
+        }
+        iframe.show {
+            height: 450px; /* 播放视频时显示的高度 */
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.2rem;
+            }
+            iframe.show {
+                height: 300px; /* 移动设备上的高度调整 */
+            }
+        }
+        @media (max-width: 480px) {
+            iframe.show {
+                height: 200px; /* 小屏幕设备上的高度调整 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>全能TV</h1>
+    <form id="videoForm">
+        <input type="text" id="videoUrl" placeholder="请输入视频地址" required>
+        <button type="submit">播放</button>
+    </form>
+    <iframe id="videoFrame" class="" allowfullscreen></iframe>
+
+    <script>
+        const form = document.getElementById('videoForm');
+        const input = document.getElementById('videoUrl');
+        const iframe = document.getElementById('videoFrame');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault(); // 阻止表单的默认提交行为
+            const videoUrl = input.value.trim();
+            if (videoUrl) {
+                iframe.src = `https://www.yemu.xyz/?url=${encodeURIComponent(videoUrl)}`;//https://z1.m1907.top/?jx= https://www.yemu.xyz/?url=
+                iframe.classList.add('show'); // 添加显示类
+                iframe.setAttribute('allowfullscreen', 'true'); // 确保支持全屏
+            }
+        });
+    </script>
+</body>
+</html>
