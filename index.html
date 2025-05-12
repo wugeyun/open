@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>武哥云相册</title>
+    <title>武哥云</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Animate.css 动画库 -->
@@ -54,7 +54,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             background: white;
             cursor: pointer;
             display: flex;
@@ -69,30 +69,31 @@
         
         .card-img-container {
             overflow: hidden;
-            background-color: #f5f5f5; /* 轻微背景色替代占位图 */
+            background-color: #f5f5f5;
+            min-height: 250px; /* 为懒加载保留空间 */
         }
         
         .card-img-top {
             width: 100%;
+            height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease;
-            display: block; /* 修改为 block，确保图片默认显示 */
             opacity: 0;
-            animation: fadeIn 0.5s ease forwards;
+            transition: opacity 0.5s ease;
         }
         
-        @keyframes fadeIn {
-            to { opacity: 1; }
+        .card-img-top.loaded {
+            opacity: 1;
         }
         
         /* 横版图片样式 */
         .landscape {
-            height: 250px;
+            aspect-ratio: 16/10;
         }
         
         /* 竖版图片样式 */
         .portrait {
-            height: 350px;
+            aspect-ratio: 10/16;
         }
         
         .photo-card:hover .card-img-top {
@@ -172,83 +173,277 @@
 </head>
 <body>
     <!-- 粒子背景 -->
-    <canvas id="particles" class="particles"></canvas>
-    
+    <canvas id="particles" class="particles"></canvas>    
     <div class="container album-container">
         <h1 class="page-title animate__animated animate__fadeInDown">武哥作品画廊</h1>
         
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <!-- 照片卡片1 - 横版 -->
+            
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250511_181739.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250511_181739.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">大楼</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250511_181656.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250511_181656.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">栈道</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250511_180110.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250511_180110.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">河边</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250511_115308.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250511_115308.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">村口</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250510_165522.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250510_165522.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">地铁</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250510_133655.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250510_133655.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">台阶</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250509_101015.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250509_101015.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">球场</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250505_153454.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250505_153454.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">大厦</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250503_174804.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250503_174804.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">汽车</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 竖版 -->
             <div class="col animate__animated animate__fadeIn">
-                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="https://img-s.msn.cn/tenant/amp/entityid/BB1msG12">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250502_140125.jpg">
                     <div class="card-img-container">
-                        <img data-src="https://img-s.msn.cn/tenant/amp/entityid/BB1msG12" class="card-img-top lazy landscape" alt="未来城市">
+                        <img data-src="./img/IMG_20250502_140125.jpg" class="card-img-top lazy portrait">
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">未来城市</h5>
+                        <h5 class="card-title">路标</h5>
                     </div>
                 </div>
             </div>
-            
-            <!-- 照片卡片2 - 竖版 -->
-            <div class="col animate__animated animate__fadeIn animate__delay-1s">
-                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="https://img.500px.me/500px1112635513.jpg!p5">
-                    <div class="card-img-container">
-                        <img data-src="https://img.500px.me/500px1112635513.jpg!p5" class="card-img-top lazy portrait" alt="自然风光">
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">自然风光</h5>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 照片卡片3 - 横版 -->
-            <div class="col animate__animated animate__fadeIn animate__delay-2s">
-                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="https://img-s.msn.cn/tenant/amp/entityid/BB1msG12">
-                    <div class="card-img-container">
-                        <img data-src="https://img-s.msn.cn/tenant/amp/entityid/BB1msG12" class="card-img-top lazy landscape" alt="数字宇宙">
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">数字宇宙</h5>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 照片卡片4 - 竖版 -->
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250502_124235.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250502_124235.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">山顶</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 横版 -->
+			<div class="col animate__animated animate__fadeIn">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250501_142535.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20250501_142535.jpg" class="card-img-top lazy landscape">
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">怪兽</h5>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 竖版 -->
             <div class="col animate__animated animate__fadeIn">
-                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="https://img.500px.me/500px1112635513.jpg!p5">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250501_113335.jpg">
                     <div class="card-img-container">
-                        <img data-src="https://img.500px.me/500px1112635513.jpg!p5" class="card-img-top lazy portrait" alt="山水之间">
+                        <img data-src="./img/IMG_20250501_113335.jpg" class="card-img-top lazy portrait">
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">山水之间</h5>
+                        <h5 class="card-title">公园</h5>
                     </div>
                 </div>
             </div>
-            
-            <!-- 照片卡片5 - 横版 -->
+			
+			<!-- 竖版 -->
+            <div class="col animate__animated animate__fadeIn">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250415_185831.jpg">
+                    <div class="card-img-container">
+                        <img data-src="./img/IMG_20250415_185831.jpg" class="card-img-top lazy portrait">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">街道</h5>
+                    </div>
+                </div>
+            </div>
+			
+			<!-- 竖版 -->
+            <div class="col animate__animated animate__fadeIn">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250418_085823.jpg">
+                    <div class="card-img-container">
+                        <img data-src="./img/IMG_20250418_085823.jpg" class="card-img-top lazy portrait">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">路口</h5>
+                    </div>
+                </div>
+            </div>
+
+			<!-- 竖版 -->
+            <div class="col animate__animated animate__fadeIn">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250418_105657.jpg">
+                    <div class="card-img-container">
+                        <img data-src="./img/IMG_20250418_105657.jpg" class="card-img-top lazy portrait">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">奥利匹克</h5>
+                    </div>
+                </div>
+            </div>
+			
+			<!-- 竖版 -->
             <div class="col animate__animated animate__fadeIn animate__delay-1s">
-                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="https://img-s.msn.cn/tenant/amp/entityid/BB1msG12">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20250129_144240.jpg">
                     <div class="card-img-container">
-                        <img data-src="https://img-s.msn.cn/tenant/amp/entityid/BB1msG12" class="card-img-top lazy landscape" alt="光影交错">
+                        <img data-src="./img/IMG_20250129_144240.jpg" class="card-img-top lazy portrait" >
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">光影交错</h5>
+                        <h5 class="card-title">商场</h5>
                     </div>
                 </div>
             </div>
-            
-            <!-- 照片卡片6 - 竖版 -->
-            <div class="col animate__animated animate__fadeIn animate__delay-2s">
-                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="https://img.500px.me/500px1112635513.jpg!p5">
+			
+			<!-- 横版 -->
+            <div class="col animate__animated animate__fadeIn">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20241127_172108.jpg">
                     <div class="card-img-container">
-                        <img data-src="https://img.500px.me/500px1112635513.jpg!p5" class="card-img-top lazy portrait" alt="静谧时光">
+                        <img data-src="./img/IMG_20241127_172108.jpg" class="card-img-top lazy landscape">
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">静谧时光</h5>
+                        <h5 class="card-title">猫</h5>
                     </div>
                 </div>
             </div>
+			
+			<!-- 横版 -->
+            <div class="col animate__animated animate__fadeIn">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20240820_093618.jpg">
+                    <div class="card-img-container">
+                        <img data-src="./img/IMG_20240820_093618.jpg" class="card-img-top lazy landscape">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">八达岭</h5>
+                    </div>
+                </div>
+            </div>
+			
+			<!-- 竖版 -->
+            <div class="col animate__animated animate__fadeIn animate__delay-1s">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20240819_074828.jpg">
+                    <div class="card-img-container">
+                        <img data-src="./img/IMG_20240819_074828.jpg" class="card-img-top lazy portrait" >
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">巷子</h5>
+                    </div>
+                </div>
+            </div>
+			
+			<!-- 横版 -->
+            <div class="col animate__animated animate__fadeIn">
+                <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20240818_191353.jpg">
+                    <div class="card-img-container">
+                        <img data-src="./img/IMG_20240818_191353.jpg" class="card-img-top lazy landscape">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">机场</h5>
+                    </div>
+                </div>
+            </div>
+			
+			<!-- 竖版 -->
+			<div class="col animate__animated animate__fadeIn animate__delay-1s">
+			    <div class="card photo-card h-100" data-bs-toggle="modal" data-bs-target="#photoModal" data-img="./img/IMG_20240511_182451.jpg">
+			        <div class="card-img-container">
+			            <img data-src="./img/IMG_20240511_182451.jpg" class="card-img-top lazy portrait" >
+			        </div>
+			        <div class="card-body">
+			            <h5 class="card-title">色彩斑斓</h5>
+			        </div>
+			    </div>
+			</div>
+			
+
         </div>
     </div>
     
@@ -310,6 +505,8 @@
                             observer.unobserve(img);
                         }
                     });
+                }, {
+                    rootMargin: '200px 0px' // 提前200px开始加载
                 });
                 
                 io.observe(target);
