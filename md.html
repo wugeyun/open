@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown预览 武哥出品</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f6f8fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 1px;
+        }
+        .editor-panel, .preview-panel {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            min-width: 100px;
+        }
+        .splitter {
+            width: 5px;
+            background: #e1e4e8;
+            cursor: col-resize;
+            position: relative;
+        }
+        .splitter:hover {
+            background: #0366d6;
+        }
+        .splitter::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 20px;
+            background: #ccc;
+        }
+        .panel-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e1e4e8;
+            font-weight: 600;
+            color: #24292e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .editor {
+            flex: 1;
+            border: none;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+        .preview {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .refresh-btn {
+            background: #0366d6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .refresh-btn:hover {
+            background: #0256cc;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .editor-panel, .preview-panel {
+                height: 50vh;
+                flex: 1 !important;
+            }
+            .splitter {
+                width: 100%;
+                height: 5px;
+                cursor: row-resize;
+            }
+            .splitter::before {
+                width: 20px;
+                height: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-panel">
+            <div class="panel-header">
+                <span>Markdown编辑器</span>
+                <button class="refresh-btn" onclick="refreshPreview()">刷新预览</button>
+            </div>
+            <textarea id="editor" class="editor" oninput="updatePreview()" placeholder="在此输入Markdown内容..."># Markdown预览工具
+
+欢迎使用纯HTML实现的Markdown预览工具！
+
+## 功能特性
+
+- 实时预览
+- 语法高亮
+- 响应式布局
+- 本地存储
+- 可调节分割线
+
+## 代码示例
+
+```python
+def hello_world():
+    print("Hello, Markdown!")
+    return True
+```
+
+## 表格示例
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 实时预览 | ✅ | 支持实时编辑预览 |
+| 语法高亮 | ✅ | 代码块语法高亮 |
+| 本地存储 | ✅ | 自动保存内容 |
+| 分割调节 | ✅ | 拖拽调整左右宽度 |
+
+## 数学公式
+
+$$ E = mc^2 $$
+
+$$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} $$</textarea>
+        </div>
+        
+        <div class="splitter" id="splitter"></div>
+        
+        <div class="preview-panel">
+            <div class="panel-header">
+                <span>实时预览</span>
+                <span id="charCount">0 字符</span>
+            </div>
+            <div id="preview" class="preview markdown-body"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>
+        // 配置marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            },
+            langPrefix: 'hljs language-'
+        });
+
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        const charCount = document.getElementById('charCount');
+
+        // 初始渲染
+        updatePreview();
+        
+        function updatePreview() {
+            const markdown = editor.value;
+            preview.innerHTML = marked.parse(markdown);
+            
+            // 更新字符计数
+            charCount.textContent = markdown.length + ' 字符';
+            
+            // 自动保存到本地存储
+            localStorage.setItem('md_preview_content', markdown);
+        }
+        
+        function refreshPreview() {
+            updatePreview();
+        }
+
+        // 分割线拖拽功能变量
+        const splitter = document.getElementById('splitter');
+        const editorPanel = document.querySelector('.editor-panel');
+        const previewPanel = document.querySelector('.preview-panel');
+        let isResizing = false;
+        
+        // 分割比例设置函数
+        function setSplitRatio(ratio) {
+            const editorWidth = ratio * 100;
+            const previewWidth = (1 - ratio) * 100;
+            
+            editorPanel.style.flex = `0 0 ${editorWidth}%`;
+            previewPanel.style.flex = `0 0 ${previewWidth}%`;
+        }
+        
+        // 从本地存储恢复内容和分割比例
+        const savedContent = localStorage.getItem('md_preview_content');
+        if (savedContent) {
+            editor.value = savedContent;
+            updatePreview();
+        }
+        
+        const savedSplitRatio = localStorage.getItem('md_split_ratio');
+        if (savedSplitRatio) {
+            setSplitRatio(parseFloat(savedSplitRatio));
+        } else {
+            setSplitRatio(0.4); // 默认预览区域占60%
+        }
+        
+        splitter.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            document.body.style.cursor = 'col-resize';
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', stopResize);
+        });
+        
+        function handleMouseMove(e) {
+            if (!isResizing) return;
+            
+            const containerRect = document.querySelector('.container').getBoundingClientRect();
+            const containerWidth = containerRect.width;
+            const mouseX = e.clientX - containerRect.left;
+            
+            // 计算新的分割比例（0-1之间）
+            const newRatio = Math.max(0.1, Math.min(0.9, mouseX / containerWidth));
+            
+            setSplitRatio(newRatio);
+        }
+        
+        function stopResize() {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', stopResize);
+            
+            // 保存分割比例到本地存储
+            const currentRatio = parseFloat(editorPanel.style.flexBasis || '50%') / 100;
+            localStorage.setItem('md_split_ratio', currentRatio.toString());
+        }
+
+        // 快捷键支持
+        editor.addEventListener('keydown', function(e) {
+            // Ctrl+S 保存
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                localStorage.setItem('md_preview_content', editor.value);
+                alert('内容已保存到本地存储');
+            }
+            
+            // Tab键缩进
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                
+                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+                updatePreview();
+            }
+        });
+
+        // 自动调整编辑器高度
+        function autoResize() {
+            editor.style.height = 'auto';
+            editor.style.height = editor.scrollHeight + 'px';
+        }
+        
+        editor.addEventListener('input', autoResize);
+        autoResize();
+
+        // 粘贴时格式化
+        editor.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const text = e.clipboardData.getData('text/plain');
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            
+            this.value = this.value.substring(0, start) + text + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + text.length;
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
