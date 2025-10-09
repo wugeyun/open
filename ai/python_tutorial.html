@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python基础教程</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .tutorial-section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-title:hover {
+            background-color: #f8f9fa;
+        }
+        .section-content {
+            display: none;
+            padding: 20px 0;
+        }
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .interactive-element {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .run-button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .run-button:hover {
+            background: #219a52;
+        }
+        .output-area {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 30px;
+            border-radius: 3px;
+        }
+        .toggle-icon {
+            font-size: 1.2em;
+        }
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav-links a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Python基础教程</h1>
+        <p>通俗易懂的交互式Python学习指南</p>
+    </div>
+
+    <div class="nav-links">
+        <a href="python_tutorial.html">Python教程</a>
+        <a href="pytorch_tutorial.html">PyTorch教程</a>
+        <a href="tensorflow_tutorial.html">TensorFlow教程</a>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section1')">
+            1. Python基础语法
+            <span class="toggle-icon" id="section1-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section1">
+            <h3>变量和数据类型</h3>
+            <div class="code-block" id="python-code-1">
+# 基本数据类型
+name = "张三"           # 字符串
+age = 25               # 整数
+height = 1.75          # 浮点数
+is_student = True      # 布尔值
+
+# 数据类型转换
+num_str = "123"
+num_int = int(num_str)  # 字符串转整数
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('python-code-1', 'python-output-1')">运行代码</button>
+                <button class="run-button" onclick="copyCode('python-code-1')">复制代码</button>
+                <div class="output-area" id="python-output-1">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>数据结构</h3>
+            <div class="code-block" id="python-code-2">
+# 列表（可变）
+fruits = ["苹果", "香蕉", "橙子"]
+fruits.append("葡萄")  # 添加元素
+
+# 元组（不可变）
+coordinates = (10, 20)
+
+# 字典（键值对）
+person = {"name": "李四", "age": 30}
+print(person["name"])  # 访问值
+
+# 集合（无序不重复）
+unique_numbers = {1, 2, 3, 3, 2}  # {1, 2, 3}
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('python-code-2', 'python-output-2')">运行代码</button>
+                <button class="run-button" onclick="copyCode('python-code-2')">复制代码</button>
+                <div class="output-area" id="python-output-2">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section2')">
+            2. 控制流程
+            <span class="toggle-icon" id="section2-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section2">
+            <h3>条件判断</h3>
+            <div class="code-block" id="python-code-3">
+age = 18
+
+if age < 18:
+    print("未成年")
+elif age >= 18 and age < 60:
+    print("成年人")
+else:
+    print("老年人")
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('python-code-3', 'python-output-3')">运行代码</button>
+                <button class="run-button" onclick="copyCode('python-code-3')">复制代码</button>
+                <div class="output-area" id="python-output-3">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>循环</h3>
+            <div class="code-block" id="python-code-4">
+# for循环
+for i in range(5):
+    print(i)
+
+# 遍历列表
+fruits = ["苹果", "香蕉", "橙子"]
+for fruit in fruits:
+    print(fruit)
+
+# while循环
+count = 0
+while count < 5:
+    print(count)
+    count += 1
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('python-code-4', 'python-output-4')">运行代码</button>
+                <button class="run-button" onclick="copyCode('python-code-4')">复制代码</button>
+                <div class="output-area" id="python-output-4">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section3')">
+            3. 函数
+            <span class="toggle-icon" id="section3-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section3">
+            <h3>定义函数</h3>
+            <div class="code-block" id="python-code-5">
+def greet(name, greeting="你好"):
+    """问候函数"""
+    return f"{greeting}, {name}!"
+
+# 调用函数
+message = greet("王五")
+print(message)  # 输出: 你好, 王五!
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('python-code-5', 'python-output-5')">运行代码</button>
+                <button class="run-button" onclick="copyCode('python-code-5')">复制代码</button>
+                <div class="output-area" id="python-output-5">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>匿名函数</h3>
+            <div class="code-block" id="python-code-6">
+# lambda函数
+square = lambda x: x ** 2
+print(square(5))  # 输出: 25
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('python-code-6', 'python-output-6')">运行代码</button>
+                <button class="run-button" onclick="copyCode('python-code-6')">复制代码</button>
+                <div class="output-area" id="python-output-6">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section4')">
+            4. 面向对象编程
+            <span class="toggle-icon" id="section4-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section4">
+            <h3>类和对象</h3>
+            <div class="code-block" id="python-code-7">
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    def introduce(self):
+        return f"我叫{self.name}, 今年{self.age}岁"
+
+# 创建对象
+person1 = Person("张三", 25)
+print(person1.introduce())
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('python-code-7', 'python-output-7')">运行代码</button>
+                <button class="run-button" onclick="copyCode('python-code-7')">复制代码</button>
+                <div class="output-area" id="python-output-7">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section5')">
+            5. 文件操作
+            <span class="toggle-icon" id="section5-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section5">
+            <h3>读写文件</h3>
+            <div class="code-block" id="python-code-8">
+# 写入文件
+with open("test.txt", "w", encoding="utf-8") as f:
+    f.write("Hello, World!\n")
+    f.write("你好，世界！")
+
+# 读取文件
+with open("test.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+    print(content)
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('python-code-8', 'python-output-8')">运行代码</button>
+                <button class="run-button" onclick="copyCode('python-code-8')">复制代码</button>
+                <div class="output-area" id="python-output-8">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 20px; color: #666; margin-top: 30px; border-top: 1px solid #eee;">
+        <p>© 2025 AI框架教程 - 专为初学者设计的深度学习教程</p>
+        <p>武哥出品</p>
+        <p><a href="index.html" style="color: #3498db; text-decoration: none;">返回主页</a></p>
+    </div>
+
+    <script>
+        function toggleSection(contentId) {
+            const content = document.getElementById(contentId);
+            const toggleIcon = document.getElementById(contentId.replace('-content', '') + '-toggle');
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                toggleIcon.textContent = '+';
+            } else {
+                content.style.display = 'block';
+                toggleIcon.textContent = '-';
+            }
+        }
+
+        function runCode(codeId, outputId) {
+            const code = document.getElementById(codeId).textContent;
+            const output = document.getElementById(outputId);
+            
+            // 简单的代码执行模拟
+            // 在实际应用中，这里会连接到后端Python执行环境
+            output.innerHTML = '<p>模拟执行代码:</p><pre>' + code + '</pre>' + 
+                              '<p>在实际环境中，这里会显示代码的执行结果。</p>' +
+                              '<p>执行时间: ' + new Date().toLocaleTimeString() + '</p>';
+        }
+        
+        // 为代码块添加复制功能
+        function copyCode(codeId) {
+            const code = document.getElementById(codeId).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("代码已复制到剪贴板！");
+            });
+        }
+
+        // 页面加载完成后，默认展开第一个部分
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleSection('section1');
+        });
+    </script>
+</body>
+</html>

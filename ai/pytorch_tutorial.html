@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyTorch深度学习教程</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .tutorial-section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-title:hover {
+            background-color: #f8f9fa;
+        }
+        .section-content {
+            display: none;
+            padding: 20px 0;
+        }
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .interactive-element {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .run-button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .run-button:hover {
+            background: #219a52;
+        }
+        .output-area {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 30px;
+            border-radius: 3px;
+        }
+        .toggle-icon {
+            font-size: 1.2em;
+        }
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav-links a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PyTorch深度学习教程</h1>
+        <p>通俗易懂的交互式PyTorch学习指南</p>
+    </div>
+
+    <div class="nav-links">
+        <a href="python_tutorial.html">Python教程</a>
+        <a href="pytorch_tutorial.html">PyTorch教程</a>
+        <a href="tensorflow_tutorial.html">TensorFlow教程</a>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section1')">
+            1. PyTorch简介
+            <span class="toggle-icon" id="section1-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section1">
+            <h3>什么是PyTorch</h3>
+            <p>PyTorch是由Meta（Facebook）开发的深度学习框架，具有以下特点：</p>
+            <ul>
+                <li>动态计算图，更Pythonic</li>
+                <li>研究友好，调试方便</li>
+                <li>学术界广泛使用</li>
+            </ul>
+            
+            <h3>安装PyTorch</h3>
+            <div class="code-block" id="pytorch-code-1">
+# CPU版本
+pip install torch torchvision torchaudio
+
+# CUDA版本（根据CUDA版本选择）
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-1', 'pytorch-output-1')">运行命令</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-1')">复制代码</button>
+                <div class="output-area" id="pytorch-output-1">点击"运行命令"查看安装说明</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section2')">
+            2. 张量（Tensors）基础
+            <span class="toggle-icon" id="section2-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section2">
+            <h3>创建张量</h3>
+            <div class="code-block" id="pytorch-code-2">
+import torch
+
+# 从列表创建
+data = [[1, 2], [3, 4]]
+x = torch.tensor(data)
+print(x)
+
+# 特殊张量
+zeros = torch.zeros(2, 3)      # 全0张量
+ones = torch.ones(2, 3)        # 全1张量
+rand = torch.rand(2, 3)        # 随机张量
+
+# 指定设备
+device = "cuda" if torch.cuda.is_available() else "cpu"
+x = torch.tensor([1, 2, 3], device=device)
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-2', 'pytorch-output-2')">运行代码</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-2')">复制代码</button>
+                <div class="output-area" id="pytorch-output-2">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>张量操作</h3>
+            <div class="code-block" id="pytorch-code-3">
+# 基本运算
+x = torch.tensor([1, 2, 3])
+y = torch.tensor([4, 5, 6])
+
+add = x + y           # 加法
+sub = x - y           # 减法
+mul = x * y           # 乘法
+div = x / y           # 除法
+
+# 矩阵乘法
+A = torch.rand(3, 4)
+B = torch.rand(4, 5)
+C = torch.matmul(A, B)  # 或 A @ B
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-3', 'pytorch-output-3')">运行代码</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-3')">复制代码</button>
+                <div class="output-area" id="pytorch-output-3">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section3')">
+            3. 自动微分（Autograd）
+            <span class="toggle-icon" id="section3-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section3">
+            <h3>梯度计算</h3>
+            <div class="code-block" id="pytorch-code-4">
+# 需要梯度的张量
+x = torch.tensor(2.0, requires_grad=True)
+y = x ** 2 + 3 * x + 1
+
+# 计算梯度
+y.backward()
+print(x.grad)  # dy/dx = 2x + 3 = 7
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-4', 'pytorch-output-4')">运行代码</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-4')">复制代码</button>
+                <div class="output-area" id="pytorch-output-4">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>复杂梯度计算</h3>
+            <div class="code-block" id="pytorch-code-5">
+x = torch.tensor([1.0, 2.0], requires_grad=True)
+y = torch.sum(x ** 2)  # y = x1² + x2²
+y.backward()
+print(x.grad)  # [2.0, 4.0]
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-5', 'pytorch-output-5')">运行代码</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-5')">复制代码</button>
+                <div class="output-area" id="pytorch-output-5">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section4')">
+            4. 神经网络模块（nn.Module）
+            <span class="toggle-icon" id="section4-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section4">
+            <h3>定义神经网络</h3>
+            <div class="code-block" id="pytorch-code-6">
+import torch.nn as nn
+
+class SimpleNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(10, 50)  # 输入10维，输出50维
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(50, 1)   # 输出1维
+    
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+
+# 创建模型
+model = SimpleNet()
+print(model)
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-6', 'pytorch-output-6')">运行代码</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-6')">复制代码</button>
+                <div class="output-area" id="pytorch-output-6">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>常用层类型</h3>
+            <div class="code-block" id="pytorch-code-7">
+# 线性层
+linear = nn.Linear(in_features=10, out_features=5)
+
+# 卷积层
+conv = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3)
+
+# 循环层
+lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
+
+# 激活函数
+relu = nn.ReLU()
+sigmoid = nn.Sigmoid()
+tanh = nn.Tanh()
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-7', 'pytorch-output-7')">运行代码</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-7')">复制代码</button>
+                <div class="output-area" id="pytorch-output-7">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section5')">
+            5. 损失函数和优化器
+            <span class="toggle-icon" id="section5-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section5">
+            <h3>损失函数</h3>
+            <div class="code-block" id="pytorch-code-8">
+import torch.nn.functional as F
+
+# 均方误差
+loss_fn = nn.MSELoss()
+
+# 交叉熵损失（分类问题）
+loss_fn = nn.CrossEntropyLoss()
+
+# 二元交叉熵
+loss_fn = nn.BCELoss()
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-8', 'pytorch-output-8')">运行代码</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-8')">复制代码</button>
+                <div class="output-area" id="pytorch-output-8">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>优化器</h3>
+            <div class="code-block" id="pytorch-code-9">
+import torch.optim as optim
+
+# 随机梯度下降
+optimizer = optim.SGD(model.parameters(), lr=0.01)
+
+# Adam优化器（推荐）
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# 带动量的SGD
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('pytorch-code-9', 'pytorch-output-9')">运行代码</button>
+                <button class="run-button" onclick="copyCode('pytorch-code-9')">复制代码</button>
+                <div class="output-area" id="pytorch-output-9">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 20px; color: #666; margin-top: 30px; border-top: 1px solid #eee;">
+        <p>© 2025 AI框架教程 - 专为初学者设计的深度学习教程</p>
+        <p>武哥出品</p>
+        <p><a href="index.html" style="color: #3498db; text-decoration: none;">返回主页</a></p>
+    </div>
+
+    <script>
+        function toggleSection(contentId) {
+            const content = document.getElementById(contentId);
+            const toggleIcon = document.getElementById(contentId.replace('-content', '') + '-toggle');
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                toggleIcon.textContent = '+';
+            } else {
+                content.style.display = 'block';
+                toggleIcon.textContent = '-';
+            }
+        }
+
+        function runCode(codeId, outputId) {
+            const code = document.getElementById(codeId).textContent;
+            const output = document.getElementById(outputId);
+            
+            // 简单的代码执行模拟
+            // 在实际应用中，这里会连接到后端Python执行环境
+            output.innerHTML = '<p>模拟执行代码:</p><pre>' + code + '</pre>' + 
+                              '<p>在实际环境中，这里会显示代码的执行结果。</p>' +
+                              '<p>执行时间: ' + new Date().toLocaleTimeString() + '</p>';
+        }
+        
+        // 为代码块添加复制功能
+        function copyCode(codeId) {
+            const code = document.getElementById(codeId).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("代码已复制到剪贴板！");
+            });
+        }
+
+        // 页面加载完成后，默认展开第一个部分
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleSection('section1');
+        });
+    </script>
+</body>
+</html>

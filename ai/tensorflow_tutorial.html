@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TensorFlow深度学习教程</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .tutorial-section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-title:hover {
+            background-color: #f8f9fa;
+        }
+        .section-content {
+            display: none;
+            padding: 20px 0;
+        }
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .interactive-element {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .run-button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .run-button:hover {
+            background: #219a52;
+        }
+        .output-area {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 30px;
+            border-radius: 3px;
+        }
+        .toggle-icon {
+            font-size: 1.2em;
+        }
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav-links a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TensorFlow深度学习教程</h1>
+        <p>通俗易懂的交互式TensorFlow学习指南</p>
+    </div>
+
+    <div class="nav-links">
+        <a href="python_tutorial.html">Python教程</a>
+        <a href="pytorch_tutorial.html">PyTorch教程</a>
+        <a href="tensorflow_tutorial.html">TensorFlow教程</a>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section1')">
+            1. TensorFlow简介
+            <span class="toggle-icon" id="section1-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section1">
+            <h3>什么是TensorFlow</h3>
+            <p>TensorFlow是由Google开发的深度学习框架，具有以下特点：</p>
+            <ul>
+                <li>静态计算图，生产环境稳定</li>
+                <li>部署成熟，工具链完整</li>
+                <li>企业级应用广泛</li>
+            </ul>
+            
+            <h3>安装TensorFlow</h3>
+            <div class="code-block" id="tensorflow-code-1">
+# CPU版本
+pip install tensorflow
+
+# GPU版本（需要CUDA）
+pip install tensorflow-gpu
+
+# 安装特定版本
+pip install tensorflow==2.13.0
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('tensorflow-code-1', 'tensorflow-output-1')">运行命令</button>
+                <button class="run-button" onclick="copyCode('tensorflow-code-1')">复制代码</button>
+                <div class="output-area" id="tensorflow-output-1">点击"运行命令"查看安装说明</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section2')">
+            2. 张量（Tensors）基础
+            <span class="toggle-icon" id="section2-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section2">
+            <h3>创建张量</h3>
+            <div class="code-block" id="tensorflow-code-2">
+import tensorflow as tf
+
+# 从列表创建
+data = [[1, 2], [3, 4]]
+x = tf.constant(data)
+print(x)
+
+# 特殊张量
+zeros = tf.zeros([2, 3])      # 全0张量
+ones = tf.ones([2, 3])        # 全1张量
+rand = tf.random.normal([2, 3])  # 随机张量
+
+# 变量（可训练参数）
+w = tf.Variable(tf.random.normal([3, 2]))
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('tensorflow-code-2', 'tensorflow-output-2')">运行代码</button>
+                <button class="run-button" onclick="copyCode('tensorflow-code-2')">复制代码</button>
+                <div class="output-area" id="tensorflow-output-2">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>张量操作</h3>
+            <div class="code-block" id="tensorflow-code-3">
+# 基本运算
+x = tf.constant([1, 2, 3])
+y = tf.constant([4, 5, 6])
+
+add = tf.add(x, y)      # 加法
+sub = tf.subtract(x, y) # 减法
+mul = tf.multiply(x, y) # 乘法
+div = tf.divide(x, y)   # 除法
+
+# 矩阵乘法
+A = tf.random.normal([3, 4])
+B = tf.random.normal([4, 5])
+C = tf.matmul(A, B)     # 矩阵乘法
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('tensorflow-code-3', 'tensorflow-output-3')">运行代码</button>
+                <button class="run-button" onclick="copyCode('tensorflow-code-3')">复制代码</button>
+                <div class="output-area" id="tensorflow-output-3">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section3')">
+            3. 自动微分（GradientTape）
+            <span class="toggle-icon" id="section3-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section3">
+            <h3>梯度计算</h3>
+            <div class="code-block" id="tensorflow-code-4">
+# 使用GradientTape记录操作
+x = tf.Variable(3.0)
+
+with tf.GradientTape() as tape:
+    y = x ** 2 + 3 * x + 1
+
+dy_dx = tape.gradient(y, x)
+print(dy_dx)  # dy/dx = 2x + 3 = 9
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('tensorflow-code-4', 'tensorflow-output-4')">运行代码</button>
+                <button class="run-button" onclick="copyCode('tensorflow-code-4')">复制代码</button>
+                <div class="output-area" id="tensorflow-output-4">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>复杂梯度计算</h3>
+            <div class="code-block" id="tensorflow-code-5">
+w = tf.Variable(tf.random.normal([3, 2]))
+b = tf.Variable(tf.zeros([2]))
+
+with tf.GradientTape() as tape:
+    y = tf.matmul(x, w) + b
+    loss = tf.reduce_mean(y ** 2)
+
+grads = tape.gradient(loss, [w, b])
+print(f"w梯度: {grads[0]}")
+print(f"b梯度: {grads[1]}")
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('tensorflow-code-5', 'tensorflow-output-5')">运行代码</button>
+                <button class="run-button" onclick="copyCode('tensorflow-code-5')">复制代码</button>
+                <div class="output-area" id="tensorflow-output-5">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section4')">
+            4. Keras API
+            <span class="toggle-icon" id="section4-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section4">
+            <h3>顺序模型（Sequential）</h3>
+            <div class="code-block" id="tensorflow-code-6">
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# 创建顺序模型
+model = keras.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(10,)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1, activation='sigmoid')
+])
+
+# 编译模型
+model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+print(model.summary())
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('tensorflow-code-6', 'tensorflow-output-6')">运行代码</button>
+                <button class="run-button" onclick="copyCode('tensorflow-code-6')">复制代码</button>
+                <div class="output-area" id="tensorflow-output-6">点击"运行代码"查看结果</div>
+            </div>
+
+            <h3>函数式API</h3>
+            <div class="code-block" id="tensorflow-code-7">
+# 更灵活的模型定义
+inputs = keras.Input(shape=(10,))
+x = layers.Dense(64, activation='relu')(inputs)
+x = layers.Dense(32, activation='relu')(x)
+outputs = layers.Dense(1, activation='sigmoid')(x)
+
+model = keras.Model(inputs=inputs, outputs=outputs)
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('tensorflow-code-7', 'tensorflow-output-7')">运行代码</button>
+                <button class="run-button" onclick="copyCode('tensorflow-code-7')">复制代码</button>
+                <div class="output-area" id="tensorflow-output-7">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-section">
+        <h2 class="section-title" onclick="toggleSection('section5')">
+            5. 层类型
+            <span class="toggle-icon" id="section5-toggle">+</span>
+        </h2>
+        <div class="section-content" id="section5">
+            <h3>常用层</h3>
+            <div class="code-block" id="tensorflow-code-8">
+# 全连接层
+dense = layers.Dense(units=64, activation='relu')
+
+# 卷积层
+conv2d = layers.Conv2D(filters=32, kernel_size=3, activation='relu')
+
+# 池化层
+max_pool = layers.MaxPooling2D(pool_size=2)
+avg_pool = layers.AveragePooling2D(pool_size=2)
+
+# 循环层
+lstm = layers.LSTM(units=50, return_sequences=True)
+gru = layers.GRU(units=50)
+
+# 正则化
+dropout = layers.Dropout(rate=0.5)
+batch_norm = layers.BatchNormalization()
+            </div>
+            <div class="interactive-element">
+                <button class="run-button" onclick="runCode('tensorflow-code-8', 'tensorflow-output-8')">运行代码</button>
+                <button class="run-button" onclick="copyCode('tensorflow-code-8')">复制代码</button>
+                <div class="output-area" id="tensorflow-output-8">点击"运行代码"查看结果</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 20px; color: #666; margin-top: 30px; border-top: 1px solid #eee;">
+        <p>© 2025 AI框架教程 - 专为初学者设计的深度学习教程</p>
+        <p>武哥出品</p>
+        <p><a href="index.html" style="color: #3498db; text-decoration: none;">返回主页</a></p>
+    </div>
+
+    <script>
+        function toggleSection(contentId) {
+            const content = document.getElementById(contentId);
+            const toggleIcon = document.getElementById(contentId.replace('-content', '') + '-toggle');
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                toggleIcon.textContent = '+';
+            } else {
+                content.style.display = 'block';
+                toggleIcon.textContent = '-';
+            }
+        }
+
+        function runCode(codeId, outputId) {
+            const code = document.getElementById(codeId).textContent;
+            const output = document.getElementById(outputId);
+            
+            // 简单的代码执行模拟
+            // 在实际应用中，这里会连接到后端Python执行环境
+            output.innerHTML = '<p>模拟执行代码:</p><pre>' + code + '</pre>' + 
+                              '<p>在实际环境中，这里会显示代码的执行结果。</p>' +
+                              '<p>执行时间: ' + new Date().toLocaleTimeString() + '</p>';
+        }
+        
+        // 为代码块添加复制功能
+        function copyCode(codeId) {
+            const code = document.getElementById(codeId).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("代码已复制到剪贴板！");
+            });
+        }
+
+        // 页面加载完成后，默认展开第一个部分
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleSection('section1');
+        });
+    </script>
+</body>
+</html>
