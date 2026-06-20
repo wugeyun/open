@@ -3,158 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>实时行情监控</title>
+    <title>USD Price API</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            background: #f6f8fa;
+            color: #24292e;
+            margin: 0 auto;
+            padding: 24px;
+            max-width: 920px;
+            line-height: 1.5;
         }
-        .dashboard {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        h1 { margin: 0 0 4px 0; font-size: 28px; }
+        .desc { color: #586069; margin: 0 0 24px 0; }
+        h2 {
+            font-size: 18px;
+            border-bottom: 1px solid #e1e4e8;
+            padding-bottom: 8px;
+            margin-top: 32px;
         }
-        .crypto-card {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center;
-            width: 300px;
+        code, pre {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
         }
-        h2 { margin: 0 0 10px 0; color: #333; font-size: 28px; }
-        .price {
-            font-size: 36px;
+        code {
+            background: rgba(27,31,35,0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 90%;
+        }
+        pre {
+            background: #24292e;
+            color: #e1e4e8;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+        .endpoint {
+            background: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin: 8px 0;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 13px;
+        }
+        .method {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: bold;
-            color: #0ecb81;
-            margin: 20px 0;
+            margin-right: 8px;
         }
-        .price.gold { color: #d4af37; }
-        .status { font-size: 12px; color: #999; min-height: 16px; }
+        table { border-collapse: collapse; width: 100%; font-size: 14px; }
+        th, td { border: 1px solid #e1e4e8; padding: 8px 12px; text-align: left; }
+        th { background: #f6f8fa; }
         button {
-            background-color: #1890ff;
+            background: #0366d6;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
+            font-size: 14px;
         }
-        button:hover { background-color: #40a9ff; }
+        button:hover { background: #0246a8; }
+        .meta { color: #586069; font-size: 12px; margin-top: 8px; }
+        .json .key { color: #79b8ff; }
+        .json .string { color: #ffab70; }
+        .json .number { color: #b392f0; }
+        .json .null { color: #959da5; }
     </style>
 </head>
 <body>
 
-<div class="dashboard">
-    <div class="crypto-card">
-        <h2>BTC / USDT</h2>
-        <div class="price" id="btc-price">加载中...</div>
-        <button onclick="fetchPrice('btc')">手动刷新</button>
-        <p class="status" id="btc-status">未更新</p>
-    </div>
+<h1>USD Price API</h1>
+<p class="desc">免费的实时美元行情 API，支持 BTC 和 XAU（黄金现货）。无需注册、无需 Key、CORS 全开。</p>
 
-    <div class="crypto-card">
-        <h2>XAU / USD</h2>
-        <div class="price gold" id="xau-price">加载中...</div>
-        <button onclick="fetchPrice('xau')">手动刷新</button>
-        <p class="status" id="xau-status">未更新</p>
-    </div>
-</div>
+<h2>接口</h2>
+<div class="endpoint"><span class="method">GET</span><code>/api/usd</code> — 返回当前价格（JSON）</div>
+<div class="endpoint"><span class="method">GET</span><code>/api/usd?symbols=btc,xau</code> — 指定品种（可选值：<code>btc</code>, <code>xau</code>，逗号分隔）</div>
+<div class="endpoint"><span class="method">GET</span><code>/usd.html?format=json</code> — 本页面的纯 JSON 视图（同 API 内容）</div>
+
+<h2>响应字段</h2>
+<table>
+    <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+    <tr><td><code>symbol</code></td><td>string</td><td>品种代码（如 <code>BTC/USDT</code>）</td></tr>
+    <tr><td><code>price</code></td><td>number | null</td><td>美元价格；所有数据源失败时为 null</td></tr>
+    <tr><td><code>source</code></td><td>string | null</td><td>实际命中的数据源</td></tr>
+    <tr><td><code>updatedAt</code></td><td>string</td><td>ISO 8601 时间戳</td></tr>
+    <tr><td><code>error</code></td><td>string | null</td><td>错误信息；成功时为 null</td></tr>
+</table>
+
+<h2>实时响应</h2>
+<button onclick="refresh()">手动刷新</button>
+<pre id="output">// 加载中...</pre>
+<p class="meta" id="meta"></p>
+
+<h2>调用示例</h2>
+<pre><code>// 浏览器 / fetch
+const r = await fetch('/api/usd');
+const data = await r.json();
+console.log(data.btc.price, data.xau.price);
+
+// curl
+curl 'https://&lt;your-project&gt;.vercel.app/api/usd'
+
+// 只取 BTC
+curl 'https://&lt;your-project&gt;.vercel.app/api/usd?symbols=btc'</code></pre>
 
 <script>
-    // 注：币安 / CoinGecko 均为公共 API，已开启 CORS，浏览器可直接调用，无需中转代理
-    const TICKERS = {
-        btc: {
-            priceEl: document.getElementById('btc-price'),
-            statusEl: document.getElementById('btc-status'),
-            sources: [
-                {
-                    name: 'Binance',
-                    url: 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT',
-                    parse: async (res) => {
-                        const d = await res.json();
-                        return parseFloat(d.price);
-                    }
-                },
-                {
-                    name: 'CoinGecko',
-                    url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
-                    parse: async (res) => {
-                        const d = await res.json();
-                        return parseFloat(d.bitcoin.usd);
-                    }
+    async function fetchOne() {
+        const params = new URLSearchParams(location.search);
+        const symbols = params.get('symbols');
+        const url = '/api/usd' + (symbols ? '?symbols=' + encodeURIComponent(symbols) : '');
+
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+    }
+
+    function highlightJson(json) {
+        const esc = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return esc
+            .replace(/("(?:\\.|[^"\\])*")(\s*:)/g, '<span class="key">$1</span>$2')
+            .replace(/:\s*("(?:\\.|[^"\\])*")/g, ': <span class="string">$1</span>')
+            .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="number">$1</span>')
+            .replace(/:\s*(null|true|false)/g, ': <span class="null">$1</span>');
+    }
+
+    function getRequestedSymbols() {
+        const raw = new URLSearchParams(location.search).get('symbols');
+        if (!raw) return ['btc', 'xau'];
+        const allowed = ['btc', 'xau'];
+        const list = raw.split(',').map(s => s.trim().toLowerCase()).filter(s => allowed.includes(s));
+        return list.length ? list : ['btc', 'xau'];
+    }
+
+    function isJsonMode() {
+        return new URLSearchParams(location.search).get('format') === 'json';
+    }
+
+    function renderJsonOnly(text) {
+        // ?format=json 模式：把整个 body 替换为简洁的 JSON 视图
+        document.body.style.cssText = 'margin:0;padding:0;background:#24292e;';
+        document.body.innerHTML =
+            `<pre style="color:#e1e4e8;padding:24px;margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.6;">${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>` +
+            `<p style="padding:8px 24px;margin:0;background:#24292e;color:#8b949e;font-size:12px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">` +
+            `<a href="${location.pathname}" style="color:#79b8ff;text-decoration:none;">← 返回文档视图</a>` +
+            ` · <a href="javascript:location.reload()" style="color:#79b8ff;text-decoration:none;">刷新</a>` +
+            `</p>`;
+    }
+
+    async function refresh() {
+        const out = document.getElementById('output');
+        const meta = document.getElementById('meta');
+        if (out) out.textContent = '// 获取中...';
+        if (meta) meta.textContent = '';
+
+        try {
+            const data = await fetchOne();
+            const text = JSON.stringify(data, null, 2);
+            const symbolCount = Object.keys(data).length;
+
+            if (isJsonMode()) {
+                renderJsonOnly(text);
+            } else {
+                if (out) {
+                    out.className = 'json';
+                    out.innerHTML = highlightJson(text);
                 }
-            ]
-        },
-        xau: {
-            priceEl: document.getElementById('xau-price'),
-            statusEl: document.getElementById('xau-status'),
-            // XAU/USD 数据源：gold-api.com 直接给伦敦金现价，CORS 全开免 key；
-            // 备选用币安 PAXG/USDT（1:1 锚定实物黄金的代币，价格非常接近现货）
-            sources: [
-                {
-                    name: 'Gold-API',
-                    url: 'https://api.gold-api.com/price/XAU',
-                    parse: async (res) => {
-                        const d = await res.json();
-                        return parseFloat(d.price);
-                    }
-                },
-                {
-                    name: 'Binance·PAXG',
-                    url: 'https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT',
-                    parse: async (res) => {
-                        const d = await res.json();
-                        return parseFloat(d.price);
-                    }
-                }
-            ]
-        }
-    };
-
-    async function fetchPrice(symbol) {
-        const t = TICKERS[symbol];
-        const { priceEl, statusEl, sources } = t;
-
-        priceEl.innerText = "获取中...";
-        priceEl.style.color = priceEl.classList.contains('gold') ? '#d4af37' : '#0ecb81';
-
-        for (const src of sources) {
-            try {
-                const res = await fetch(src.url, { cache: 'no-store' });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const price = await src.parse(res);
-                if (!isFinite(price)) throw new Error('非法的价格数据');
-
-                priceEl.innerText = `$ ${price.toFixed(2)}`;
-                statusEl.innerText = `最后更新: ${new Date().toLocaleTimeString()} · ${src.name}`;
-                return;
-            } catch (err) {
-                console.warn(`[${symbol}/${src.name}] 失败:`, err.message);
+                if (meta) meta.textContent = `更新时间: ${new Date().toLocaleString()}  ·  共 ${symbolCount} 个品种`;
             }
+        } catch (e) {
+            if (out) out.textContent = '// 获取失败: ' + e.message;
+            console.error(e);
         }
-
-        priceEl.innerText = "获取失败";
-        priceEl.style.color = "#ff4d4f";
-        statusEl.innerText = "所有数据源都不可用，详见 console";
-        console.error(`[${symbol}] 所有数据源均失败，请检查网络/科学上网状态`);
     }
 
-    async function refreshAll() {
-        // 并行刷新两个标的，单个失败互不影响
-        await Promise.allSettled([fetchPrice('btc'), fetchPrice('xau')]);
-    }
-
-    // 页面加载时自动获取一次，之后只能手动刷新
-    refreshAll();
+    // 首次打开自动获取
+    refresh();
 </script>
 
 </body>
