@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VoxCPM Console</title>
+  <style>
+    :root {
+      --ink: #15130f;
+      --muted: #6f695d;
+      --paper: #f8f3e7;
+      --panel: #fffaf0;
+      --line: #ddd3be;
+      --field: #fffdf8;
+      --accent: #0f766e;
+      --accent-strong: #0b5f59;
+      --danger: #b42318;
+      --shadow: 0 18px 55px rgba(35, 28, 15, 0.13);
+      color-scheme: light;
+      font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.12), transparent 34%),
+        repeating-linear-gradient(90deg, rgba(20, 18, 14, 0.03) 0 1px, transparent 1px 78px),
+        var(--paper);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 44px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Songti SC", serif;
+      font-size: clamp(2.2rem, 7vw, 5.4rem);
+      line-height: 0.92;
+      letter-spacing: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--muted);
+      background: rgba(255, 250, 240, 0.72);
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 250, 240, 0.86);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(247, 238, 218, 0.72);
+      font-weight: 700;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .label-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 0 8px;
+    }
+
+    .label-row label {
+      margin: 0;
+    }
+
+    .tip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--muted);
+      background: rgba(255, 253, 248, 0.92);
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: help;
+      flex: 0 0 auto;
+    }
+
+    .tip::after {
+      content: attr(data-tip);
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      bottom: calc(100% + 9px);
+      width: min(280px, calc(100vw - 48px));
+      padding: 10px 11px;
+      border: 1px solid rgba(15, 118, 110, 0.28);
+      border-radius: 6px;
+      background: #15130f;
+      color: #fffaf0;
+      box-shadow: 0 12px 32px rgba(21, 19, 15, 0.22);
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.45;
+      text-align: left;
+      white-space: normal;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 4px);
+      transition: opacity 120ms ease, transform 120ms ease;
+    }
+
+    .tip::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      width: 10px;
+      height: 10px;
+      background: #15130f;
+      transform: translateX(-50%) rotate(45deg);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 120ms ease;
+    }
+
+    .tip:hover::after,
+    .tip:focus-visible::after,
+    .tip:hover::before,
+    .tip:focus-visible::before {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .tip:hover::before,
+    .tip:focus-visible::before {
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .tip.align-right::after {
+      left: auto;
+      right: -6px;
+      transform: translate(0, 4px);
+    }
+
+    .tip.align-right::before {
+      left: auto;
+      right: -1px;
+      transform: rotate(45deg);
+    }
+
+    .tip.align-right:hover::after,
+    .tip.align-right:focus-visible::after {
+      transform: translate(0, 0);
+    }
+
+    .tip.align-right:hover::before,
+    .tip.align-right:focus-visible::before {
+      transform: rotate(45deg);
+    }
+
+    .tip.align-left::after {
+      left: -6px;
+      right: auto;
+      transform: translate(0, 4px);
+    }
+
+    .tip.align-left::before {
+      left: -1px;
+      right: auto;
+      transform: rotate(45deg);
+    }
+
+    .tip.align-left:hover::after,
+    .tip.align-left:focus-visible::after {
+      transform: translate(0, 0);
+    }
+
+    .tip.align-left:hover::before,
+    .tip.align-left:focus-visible::before {
+      transform: rotate(45deg);
+    }
+
+    textarea,
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--field);
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    textarea {
+      min-height: 210px;
+      padding: 14px;
+      resize: vertical;
+      line-height: 1.7;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      height: 42px;
+      padding: 0 11px;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: rgba(15, 118, 110, 0.8);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 12px;
+    }
+
+    .checks {
+      display: grid;
+      gap: 10px;
+      margin: 4px 0 16px;
+    }
+
+    select:disabled {
+      cursor: not-allowed;
+      color: var(--muted);
+      background: rgba(221, 211, 190, 0.35);
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 40px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 253, 248, 0.74);
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+
+    .check input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .file {
+      display: grid;
+      gap: 9px;
+      min-height: 96px;
+      padding: 13px;
+      border: 1px dashed rgba(15, 118, 110, 0.55);
+      border-radius: 8px;
+      background: rgba(15, 118, 110, 0.055);
+    }
+
+    input[type="file"] {
+      width: 100%;
+      font: inherit;
+      color: var(--muted);
+    }
+
+    button {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--accent);
+      color: white;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 140ms ease, background 140ms ease, opacity 140ms ease;
+    }
+
+    button:hover {
+      background: var(--accent-strong);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.64;
+      transform: none;
+    }
+
+    .status {
+      min-height: 44px;
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 253, 248, 0.7);
+      color: var(--muted);
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .status.error {
+      border-color: rgba(180, 35, 24, 0.35);
+      color: var(--danger);
+      background: rgba(180, 35, 24, 0.06);
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 42px;
+      margin-top: 10px;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      color: var(--accent-strong);
+      text-decoration: none;
+      font-weight: 800;
+      background: rgba(15, 118, 110, 0.08);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .log {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .log div {
+      min-height: 28px;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 253, 248, 0.62);
+    }
+
+    @media (max-width: 840px) {
+      header,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .badge {
+        justify-content: center;
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>VoxCPM Console</h1>
+      <div class="badge" id="connectionBadge">未连接</div>
+    </header>
+
+    <section class="layout">
+      <form class="panel" id="voiceForm">
+        <div class="panel-head">
+          <span>生成参数</span>
+          <span id="queueState">待机</span>
+        </div>
+        <div class="panel-body">
+          <div class="field">
+            <div class="label-row">
+              <label for="text">文本</label>
+              <span class="tip align-left" tabindex="0" data-tip="要合成的目标内容。建议一次输入短段落；太长的文本可能排队更久，也更容易被 Space 超时。">?</span>
+            </div>
+            <textarea id="text" required>你好，这是通过纯前端页面调用 Hugging Face VoxCPM Demo 生成的语音。</textarea>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <div class="label-row">
+                <label for="control">风格控制</label>
+                <span class="tip align-left" tabindex="0" data-tip="用文字描述想要的声音和表达方式，例如年龄、性别、语速、情绪、场景。没有参考音频时，它相当于音色提示词。">?</span>
+              </div>
+              <input id="control" type="text" placeholder="例如：温柔、沉稳、新闻播报" />
+            </div>
+            <div class="field">
+              <div class="label-row">
+                <label for="cfg">CFG</label>
+                <span class="tip align-right" tabindex="0" data-tip="控制模型遵循文本和风格条件的强度。数值越高通常越贴近提示，但也可能更生硬；默认 2.0 比较稳。">?</span>
+              </div>
+              <input id="cfg" type="number" min="1" max="3" step="0.1" value="2.0" />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="presetSelect">预设音色</label>
+              <span class="tip align-left" tabindex="0" data-tip="这些不是固定音色库，而是预设好的风格控制词。未上传参考音频时可用；上传参考音频后会自动禁用。">?</span>
+            </div>
+            <select id="presetSelect">
+              <option value="">不使用预设</option>
+              <option value="soft_girl">温柔女声</option>
+              <option value="calm_male">沉稳男声</option>
+              <option value="news">新闻播报</option>
+              <option value="story">故事旁白</option>
+              <option value="customer">客服语气</option>
+              <option value="anime">元气少女</option>
+            </select>
+          </div>
+
+          <div class="field file">
+            <div class="label-row">
+              <label for="reference">参考音频</label>
+              <span class="tip align-left" tabindex="0" data-tip="上传一段你想模仿的声音，建议清晰、无背景音乐、时长不超过 50 秒。上传后会优先使用参考音色。">?</span>
+            </div>
+            <input id="reference" type="file" accept="audio/*" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="promptText">参考音频文字</label>
+              <span class="tip align-left" tabindex="0" data-tip="参考音频中实际说出的文字。开启精准克隆时需要填写，模型会把参考音频当作前缀继续往后说。">?</span>
+            </div>
+            <input id="promptText" type="text" placeholder="启用精准克隆时填写" />
+          </div>
+
+          <div class="checks">
+            <label class="check">
+              <input id="usePromptText" type="checkbox" />
+              <span>精准克隆</span>
+              <span class="tip" tabindex="0" data-tip="需要参考音频和对应文字。它会尽量延续参考音频的音色、语气和细节；开启后风格控制基本不再起主要作用。">?</span>
+            </label>
+            <label class="check">
+              <input id="normalize" type="checkbox" />
+              <span>文本规范化</span>
+              <span class="tip" tabindex="0" data-tip="把数字、日期、符号等改成更适合朗读的形式，例如 2026 可能转成中文或英文读法。遇到特殊格式时可关闭。">?</span>
+            </label>
+            <label class="check">
+              <input id="denoise" type="checkbox" />
+              <span>参考音频降噪</span>
+              <span class="tip" tabindex="0" data-tip="在使用参考音频前尝试去除噪声。适合有底噪的录音；如果原音频很干净，关闭可能保留更多音色细节。">?</span>
+            </label>
+          </div>
+
+          <button id="submitBtn" type="submit">生成语音</button>
+          <div class="status" id="status">页面加载后会连接 openbmb/VoxCPM-Demo。</div>
+        </div>
+      </form>
+
+      <aside class="panel">
+        <div class="panel-head">
+          <span>输出</span>
+          <span id="elapsed">0.0s</span>
+        </div>
+        <div class="panel-body">
+          <audio id="player" controls hidden></audio>
+          <a class="download" id="download" href="#" download="voxcpm-output.mp3" hidden>下载音频</a>
+          <div class="log" id="log">
+            <div>目标 Space：openbmb/VoxCPM-Demo</div>
+            <div>端点：/generate</div>
+            <div>输出：MP3 临时文件</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const SPACE_ORIGIN = "https://openbmb-voxcpm-demo.hf.space";
+
+    const els = {
+      form: document.querySelector("#voiceForm"),
+      text: document.querySelector("#text"),
+      control: document.querySelector("#control"),
+      reference: document.querySelector("#reference"),
+      presetSelect: document.querySelector("#presetSelect"),
+      usePromptText: document.querySelector("#usePromptText"),
+      promptText: document.querySelector("#promptText"),
+      cfg: document.querySelector("#cfg"),
+      normalize: document.querySelector("#normalize"),
+      denoise: document.querySelector("#denoise"),
+      submit: document.querySelector("#submitBtn"),
+      status: document.querySelector("#status"),
+      player: document.querySelector("#player"),
+      download: document.querySelector("#download"),
+      badge: document.querySelector("#connectionBadge"),
+      queueState: document.querySelector("#queueState"),
+      elapsed: document.querySelector("#elapsed"),
+      log: document.querySelector("#log"),
+    };
+
+    let timer;
+    let selectedPreset = "";
+    let currentAudioUrl = "";
+
+    const PRESETS = {
+      soft_girl: "A young woman with a soft, warm, gentle voice. Speaks clearly at a relaxed pace with a friendly and slightly sweet tone.",
+      calm_male: "A mature male voice, low and steady. Calm, trustworthy, clear pronunciation, suitable for explanations and narration.",
+      news: "Professional news anchor voice. Neutral emotion, crisp articulation, stable pace, formal and confident delivery.",
+      story: "Warm storyteller voice. Expressive but not exaggerated, gentle pacing, vivid narration suitable for bedtime stories.",
+      customer: "Friendly customer service voice. Patient, polite, bright, clear, with a reassuring and helpful tone.",
+      anime: "Energetic young girl voice. Bright, lively, cute, fast but clear speaking style, cheerful emotion.",
+    };
+
+    function setStatus(message, isError = false) {
+      els.status.textContent = message;
+      els.status.classList.toggle("error", isError);
+    }
+
+    function setBusy(isBusy) {
+      els.submit.disabled = isBusy;
+      els.queueState.textContent = isBusy ? "生成中" : "待机";
+    }
+
+    function hasReferenceAudio() {
+      return Boolean(els.reference.files && els.reference.files.length > 0);
+    }
+
+    function syncPresetState() {
+      const disabled = hasReferenceAudio();
+      els.presetSelect.disabled = disabled;
+      if (disabled) selectedPreset = "";
+      els.presetSelect.value = selectedPreset;
+    }
+
+    function resolveAudioUrl(payload) {
+      const item = Array.isArray(payload) ? payload[0] : payload;
+      if (typeof item === "string") return item;
+      if (item?.url) return item.url;
+      if (item?.path && item.path.startsWith("http")) return item.path;
+      throw new Error("返回结果里没有可播放的音频 URL。");
+    }
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        let detail = "";
+        try {
+          detail = JSON.stringify(await response.json());
+        } catch {
+          detail = await response.text();
+        }
+        throw new Error(`${response.status} ${response.statusText}: ${detail}`);
+      }
+      return response.json();
+    }
+
+    async function uploadReference(file) {
+      const form = new FormData();
+      form.append("files", file, file.name);
+      const paths = await fetchJson(`${SPACE_ORIGIN}/gradio_api/upload`, {
+        method: "POST",
+        body: form,
+      });
+      const path = paths?.[0];
+      if (!path) throw new Error("参考音频上传失败。");
+      return {
+        path,
+        orig_name: file.name,
+        size: file.size,
+        mime_type: file.type || "audio/wav",
+        meta: { _type: "gradio.FileData" },
+      };
+    }
+
+    function parseSseResult(text) {
+      const events = text.split(/\n\n+/).filter(Boolean);
+      let lastEvent = "";
+      for (const eventText of events) {
+        const eventName = eventText.match(/^event:\s*(.+)$/m)?.[1]?.trim();
+        const dataLine = eventText.match(/^data:\s*(.+)$/m)?.[1];
+        if (!eventName || !dataLine) continue;
+        lastEvent = eventName;
+        if (eventName === "complete") return JSON.parse(dataLine);
+        if (eventName === "error") throw new Error(dataLine);
+      }
+      throw new Error(lastEvent ? `队列结束但没有返回音频：${lastEvent}` : "队列没有返回结果。");
+    }
+
+    async function callGenerate(data) {
+      const call = await fetchJson(`${SPACE_ORIGIN}/gradio_api/call/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data }),
+      });
+      if (!call.event_id) throw new Error("提交队列失败，没有 event_id。");
+
+      setStatus(`请求已进入队列：${call.event_id.slice(0, 8)}...`);
+      const response = await fetch(`${SPACE_ORIGIN}/gradio_api/call/generate/${call.event_id}`);
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`);
+      }
+      return parseSseResult(await response.text());
+    }
+
+    async function connect() {
+      try {
+        els.badge.textContent = "连接中";
+        const info = await fetchJson(`${SPACE_ORIGIN}/gradio_api/info`);
+        if (!info?.named_endpoints?.["/generate"]) {
+          throw new Error("Space 没有公开 /generate 接口。");
+        }
+        els.badge.textContent = "已连接";
+        setStatus("已连接，可以生成。");
+      } catch (error) {
+        els.badge.textContent = "连接失败";
+        setStatus(
+          `${error.message || String(error)}。请确认能打开 ${SPACE_ORIGIN}/`,
+          true
+        );
+      }
+    }
+
+    els.form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const text = els.text.value.trim();
+      if (!text) {
+        setStatus("请先输入文本。", true);
+        return;
+      }
+
+      const referenceFile = els.reference.files[0];
+      if (els.usePromptText.checked && !referenceFile) {
+        setStatus("精准克隆需要参考音频。", true);
+        return;
+      }
+
+      const startedAt = performance.now();
+      timer = window.setInterval(() => {
+        els.elapsed.textContent = `${((performance.now() - startedAt) / 1000).toFixed(1)}s`;
+      }, 120);
+
+      setBusy(true);
+      setStatus("请求已提交，等待 Space 队列返回。");
+      els.player.hidden = true;
+      els.download.hidden = true;
+
+      try {
+        const referenceData = referenceFile ? await uploadReference(referenceFile) : null;
+        const result = await callGenerate([
+          text,
+          referenceData ? "" : els.control.value.trim(),
+          referenceData,
+          els.usePromptText.checked,
+          els.promptText.value.trim(),
+          Number(els.cfg.value || 2),
+          els.normalize.checked,
+          els.denoise.checked,
+        ]);
+
+        const audioUrl = resolveAudioUrl(result);
+        currentAudioUrl = audioUrl;
+        els.player.src = audioUrl;
+        els.download.href = audioUrl;
+        els.player.hidden = false;
+        els.download.hidden = false;
+        setStatus("生成完成。");
+      } catch (error) {
+        setStatus(error.message || String(error), true);
+      } finally {
+        window.clearInterval(timer);
+        els.elapsed.textContent = `${((performance.now() - startedAt) / 1000).toFixed(1)}s`;
+        setBusy(false);
+      }
+    });
+
+    els.presetSelect.addEventListener("change", () => {
+      if (els.presetSelect.disabled) return;
+      selectedPreset = els.presetSelect.value;
+      els.control.value = selectedPreset ? PRESETS[selectedPreset] : "";
+      syncPresetState();
+    });
+
+    els.reference.addEventListener("change", () => {
+      if (hasReferenceAudio()) {
+        els.control.value = "";
+        els.usePromptText.checked = false;
+        selectedPreset = "";
+        setStatus("已选择参考音频，预设音色已禁用。");
+      } else {
+        setStatus("未选择参考音频，可以使用预设音色。");
+      }
+      syncPresetState();
+    });
+
+    els.download.addEventListener("click", async (event) => {
+      event.preventDefault();
+      if (!currentAudioUrl) {
+        setStatus("还没有可下载的音频。", true);
+        return;
+      }
+
+      const originalText = els.download.textContent;
+      els.download.textContent = "准备下载...";
+      try {
+        const response = await fetch(currentAudioUrl);
+        if (!response.ok) {
+          throw new Error(`${response.status} ${response.statusText}`);
+        }
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+        link.href = blobUrl;
+        link.download = `voxcpm-${stamp}.mp3`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
+        setStatus("下载已开始。");
+      } catch (error) {
+        setStatus(`下载失败：${error.message || String(error)}`, true);
+      } finally {
+        els.download.textContent = originalText;
+      }
+    });
+
+    syncPresetState();
+    connect();
+  </script>
+</body>
+</html>
