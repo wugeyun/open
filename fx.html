@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多品种「支撑 / 阻力」自动判断 · BTC/USD & XAU/USD</title>
+<style>
+  :root {
+    --bg:#0f1420; --panel:#171e2e; --panel2:#1b2436; --line:#2a3550;
+    --text:#e6ebf5; --muted:#8b97ad; --bull:#26d07c; --bear:#ff5d5d;
+    --orange:#ff9f43; --blue:#4da3ff; --gold:#f5c518;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+    padding:28px 20px 48px;display:flex;flex-direction:column;align-items:center;}
+  .wrap{max-width:1120px;width:100%;}
+  h1{font-size:22px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .sub{color:var(--muted);font-size:13px;margin-top:6px;line-height:1.7;}
+  .sub b{color:var(--text);}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel2);}
+  .seg button{border:none;background:transparent;color:var(--muted);padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;}
+  .seg button.on{background:linear-gradient(90deg,#4da3ff,#26d07c);color:#0f1420;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:18px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr;}}
+  .card h2{font-size:15px;font-weight:700;margin-bottom:4px;}
+  .card .hint{font-size:12px;color:var(--muted);margin-bottom:14px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;}
+  .field input,.field select{width:100%;padding:10px 12px;font-size:14px;color:var(--text);
+    background:var(--panel2);border:1px solid var(--line);border-radius:8px;outline:none;}
+  .field input:focus,.field select:focus{border-color:var(--blue);}
+  .field input.auto{border-right:3px solid var(--blue);}
+  .btn{width:100%;padding:12px;font-size:14.5px;font-weight:700;color:#0f1420;
+    background:linear-gradient(90deg,#4da3ff,#26d07c);border:none;border-radius:9px;
+    cursor:pointer;margin-top:6px;}
+  .btn:hover{opacity:.92;}
+  .reset{background:transparent;color:var(--muted);border:1px solid var(--line);}
+  .result{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px;}
+  .meter{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .meter .lbl{width:150px;font-size:12.5px;color:var(--muted);flex-shrink:0;}
+  .bar{flex:1;height:10px;background:#232f4a;border-radius:6px;overflow:hidden;}
+  .fill{height:100%;border-radius:6px;transition:width .4s ease,background .4s ease;}
+  .val{width:70px;text-align:right;font-size:13px;font-weight:700;}
+  .pass{color:var(--bull);}.fail{color:var(--bear);}.warn{color:var(--orange);}
+  .banner{font-size:14px;font-weight:700;padding:12px 14px;border-radius:9px;margin-bottom:12px;}
+  .banner.ok{background:rgba(38,208,124,.14);color:var(--bull);border:1px solid rgba(38,208,124,.4);}
+  .banner.warn{background:rgba(255,159,67,.12);color:var(--orange);border:1px solid rgba(255,159,67,.4);}
+  .banner.no{background:rgba(255,93,93,.12);color:var(--bear);border:1px solid rgba(255,93,93,.4);}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;}
+  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);}
+  th{color:var(--muted);font-weight:500;font-size:12px;}
+  td b{font-size:13.5px;}
+  .note{margin-top:16px;font-size:12px;color:var(--muted);line-height:1.8;
+    border-top:1px dashed var(--line);padding-top:12px;}
+  .feed{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .src-badge{font-size:12px;padding:4px 10px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);}
+  .src-badge.on{color:var(--blue);border-color:var(--blue);background:rgba(77,163,255,.1);}
+  .live-price{font-size:30px;font-weight:800;color:var(--bull);}
+  .live-meta{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.7;}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .chip{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;}
+  .chip.auto{background:rgba(77,163,255,.14);color:var(--blue);}
+  .chip.manual{background:rgba(255,159,67,.14);color:var(--orange);}
+  .krow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:4px 0;}
+  .kbar{height:12px;border-radius:3px;}
+  /* 支撑/阻力两栏 */
+  .zones{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:640px){.zones{grid-template-columns:1fr;}}
+  .zone{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px;}
+  .zone .ztitle{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .zone .ztitle sup{font-size:10px;color:var(--muted);font-weight:400;}
+  .zone.sup{border-color:rgba(38,208,124,.35);}
+  .zone.res{border-color:rgba(255,159,67,.35);}
+  .zlvl{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:8px;background:var(--panel);border:1px solid var(--line);font-size:12.5px;cursor:pointer;margin-bottom:6px;}
+  .zlvl:hover{border-color:var(--blue);}
+  .zlvl.sel{border-color:var(--bsel,#4da3ff);box-shadow:0 0 0 1px var(--bsel,#4da3ff);}
+  .zone.sup .zlvl.sel{--bsel:var(--bull);}
+  .zone.res .zlvl.sel{--bsel:var(--orange);}
+  .zlvl .zb{font-weight:800;font-size:13px;}
+  .zlvl .zm{margin-left:auto;font-size:11px;color:var(--muted);}
+  .zlvl .reco{font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(38,208,124,.18);color:var(--bull);}
+  .zone.res .zlvl .reco{background:rgba(255,159,67,.18);color:var(--orange);}
+  .dir-tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>
+    🎯 多品种「支撑 / 阻力」自动判断
+    <span class="seg" id="seg">
+      <button id="segXAU" class="on" onclick="switchSym('XAU')">XAU / USD</button>
+      <button id="segBTC" onclick="switchSym('BTC')">BTC / USD</button>
+    </span>
+  </h1>
+  <p class="sub">
+    <b style="color:var(--orange)">自动识别支撑位</b>与<b style="color:var(--green)">阻力位</b>列表，各自推荐最佳判断位置；
+    当前品种：<b id="symName">XAU/USD</b>。点击任意位置 → 判定数据自动联动。打开默认选中<b style="color:var(--blue)">推荐位置</b>。
+  </p>
+
+  <!-- 自动行情 -->
+  <div class="card">
+    <h2>📡 自动实时行情</h2>
+    <p class="hint">手动点击刷新获取最新行情</p>
+    <div class="feed">
+      <div class="live-price" id="livePrice">--</div>
+      <div class="src-badge" id="srcBadge">连接中…</div>
+      <div style="flex:1"></div>
+      <button class="btn" style="width:auto;padding:10px 18px;background:linear-gradient(90deg,#4da3ff,#26d07c);" onclick="autoConnect(true)">🔄 立即刷新</button>
+    </div>
+    <div class="live-meta" id="liveMeta">正在尝试连接多数据源…</div>
+
+    <div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:12px;">
+      <div class="hint" style="margin-bottom:8px;">📐 自动识别的支撑 / 阻力位置（点击切换判定）</div>
+      <div class="zones">
+        <div class="zone sup">
+          <div class="ztitle">🟢 支撑位 <sup>价格下方 · 缩量守住看多</sup></div>
+          <div id="supList"></div>
+        </div>
+        <div class="zone res">
+          <div class="ztitle">🟠 阻力位 <sup>价格上方 · 放量突破看多</sup></div>
+          <div id="resList"></div>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:8px;">推荐位 = 评分最高者，带「推荐」徽标</div>
+    </div>
+
+    <div style="margin-top:14px;border-top:1px dashed var(--line);padding-top:10px;">
+      <div class="hint" style="margin-bottom:6px;">近 10 根日 K 收盘（有K线数据时自动显示）</div>
+      <div id="klist"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- 左：判定数据 -->
+    <div class="card">
+      <h2>① 判定数据（自动填充，可改）</h2>
+      <p class="hint">★蓝色=自动值，改后立即重算</p>
+      <div class="field"><label>当前价格 (USD)<span class="chip auto" id="tagprice">自动</span></label>
+        <input type="number" id="price" step="1" class="auto" oninput="onManual('price');calc()"></div>
+      <div class="field"><label>当前 K 线成交量<span class="chip auto" id="tagvol">自动</span></label>
+        <input type="number" id="vol" step="1000" class="auto" oninput="onManual('vol');calc()"></div>
+      <div class="field"><label>20 日平均成交量<span class="chip auto" id="tagavg">自动</span></label>
+        <input type="number" id="avgvol" step="1000" class="auto" oninput="onManual('avg');calc()"></div>
+      <div class="field"><label>连续在该位置上方（根数）<span class="chip auto" id="taghold">自动</span></label>
+        <input type="number" id="holdk" step="1" class="auto" oninput="onManual('hold');calc()"></div>
+      <div class="field"><label>当前判定方向<span class="chip manual" id="tagdir">自动</span></label>
+        <input type="text" id="dirbox" class="auto" readonly style="background:var(--panel2);"></div>
+      <div class="field"><label>判定关键位价 (USD)<span class="chip manual" id="tagkey">自动</span></label>
+        <input type="number" id="keylvl" step="1" class="auto" oninput="onManual('key');calc()"></div>
+      <div class="field"><label>回踩该位置是否守住（未跌破）<span class="chip manual">需人工确认</span></label>
+        <select id="pull" onchange="calc()"><option value="no">还没回踩 / 不确定</option><option value="yes">已回踩且守住 (有效)</option><option value="break">已跌破</option></select>
+      </div>
+      <button class="btn reset" onclick="reset()">重置全部为自动</button>
+      <div class="result" id="result"></div>
+    </div>
+
+    <!-- 右：结果 -->
+    <div class="card">
+      <h2>② 多空判定</h2>
+      <p class="hint">针对「<span id="keylvlName" style="color:var(--orange)">--</span>」<span id="dirName"></span>做多空判断</p>
+      <div id="output"></div>
+      <div class="result" style="margin-top:14px;">
+        <table>
+          <tr><th>因子</th><th>当前</th></tr>
+          <tr><td>量比（量能）</td><td class="warn" id="s_vol">—</td></tr>
+          <tr><td>位置（连续站立）</td><td class="warn" id="s_hold">—</td></tr>
+          <tr><td>回踩/得失</td><td class="warn" id="s_pull">—</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="hint" style="margin-bottom:8px;">判定标准参考（多空对称：由"价格相对位置 + 量能"共同决定）</div>
+    <table>
+      <tr><th>所处区域</th><th>量能/行为</th><th>方向</th></tr>
+      <tr><td rowspan="2" class="up">多头区<br><span style="font-size:11px;color:var(--muted)">价在 关键位 上方</span></td><td>缩量守住 / 回踩不破</td><td class="up">🟢 看多（支撑有效）</td></tr>
+      <tr><td>放量跌破 关键位</td><td class="fail">🔴 看空（支撑转阻力）</td></tr>
+      <tr><td rowspan="2" class="warn">空头区<br><span style="font-size:11px;color:var(--muted)">价在 关键位 下方</span></td><td>放量突破并站稳</td><td class="up">🟢 看多（阻力转支撑）</td></tr>
+      <tr><td>缩量遇阻回落</td><td class="fail">🔴 看空（阻力压制）</td></tr>
+    </table>
+    <div class="note">⚠️ 本工具为教学用途。支撑/阻力由公开行情自动识别，可能因网络/限频延迟。黄金(XAU)部分免费源缺历史K线，均量/连续根数需手动补充。所有判断仅为统计参考，不构成投资建议。</div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+function fmt(n,d){ d=d==null?2:d; return n==null||isNaN(n)?'—':Number(n).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:0}); }
+function fmt0(n){ return fmt(n, n>=10000?0:2); }
+
+let SYM='XAU';
+let autoPushed={};
+let K=4600;            // 当前判定的关键位
+let DIR='sup';         // 当前判定方向: sup=支撑, res=阻力
+let SUPPORTS=[];       // 支撑位候选
+let RESISTANCES=[];    // 阻力位候选
+let RAWKLINES=null;    // 原始K线用于重算
+
+const SYMBOL_CFG={
+  BTC:{name:'BTC/USD', defKey:80000, dec:0, roundBase:1000},
+  XAU:{name:'XAU/USD', defKey:4600, dec:0, roundBase:100},
+};
+
+function switchSym(s){
+  SYM=s;
+  autoPushed={};
+  K=SYMBOL_CFG[s].defKey;
+  DIR='sup';
+  $('symName').textContent=SYMBOL_CFG[s].name;
+  $('segBTC').className=''; $('segXAU').className='';
+  $(s==='BTC'?'segBTC':'segXAU').className='on';
+  autoConnect(true);
+}
+
+// ---------- 数据源 ----------
+const SOURCES={
+  BTC:[
+    {name:'Binance(BTCUSDT)',try:async()=>{
+      const [tk,kl]=await Promise.all([
+        fetchJSON('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT',8000),
+        fetchJSON('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=22',8000)
+      ]);
+      if(!tk||!tk.lastPrice||!Array.isArray(kl)||kl.length<2) throw 0;
+      return {price:+tk.lastPrice,data:kl.map(k=>({time:k[0],close:+k[4],vol:+k[5]})),vol:+tk.quoteVolume,change:+tk.priceChangePercent};
+    }},
+    {name:'OKX(BTC-USDT)',try:async()=>{
+      const [tk,kl]=await Promise.all([
+        fetchJSON('https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT',8000),
+        fetchJSON('https://www.okx.com/api/v5/market/candles?instId=BTC-USDT&bar=1D&limit=22',8000)
+      ]);
+      const d=tk&&tk.data&&tk.data[0]; if(!d||!d.last||!Array.isArray(kl)||kl.length<2) throw 0;
+      return {price:+d.last,data:kl.map(k=>({time:+k[0],close:+k[4],vol:+k[5]})),vol:+d.volCcy24h,change:+d.sodUtc0};
+    }},
+  ],
+  XAU:[
+    {name:'gold-api.com',try:async()=>{
+      const p=await fetchJSON('https://api.gold-api.com/price/XAU',8000);
+      if(!p||!p.price) throw 0;
+      return {price:p.price,data:null,vol:null,change:null,note:'仅实时价（无历史K线）'};
+    }},
+    {name:'Swissquote(XAU/USD)',try:async()=>{
+      const r=await fetchJSON('https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD',8000);
+      const d=r&&r[0]&&r[0].spreadProfilePrices&&r[0].spreadProfilePrices[0]; if(!d) throw 0;
+      return {price:(d.bid+d.ask)/2,data:null,vol:null,change:null,note:'实时中间价（无历史K线）'};
+    }},
+  ],
+};
+
+function fetchJSON(url,ms){
+  return new Promise((res,rej)=>{
+    const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),ms);
+    fetch(url,{signal:ctrl.signal}).then(r=>{clearTimeout(t);if(!r.ok){rej(r.status);return;}res(r.json());})
+      .catch(e=>{clearTimeout(t);rej(e);});
+  });
+}
+
+// 计算均量 / 连续根数（相对当前 K 和 DIR）
+function computeStats(){
+  let avgVol=null,holdCount=null;
+  if(RAWKLINES&&RAWKLINES.length){
+    const closes=RAWKLINES.map(d=>d.close);
+    const vols=RAWKLINES.map(d=>d.vol).filter(v=>v>0);
+    if(vols.length>=2) avgVol=Math.round(vols.slice(0,-1).reduce((a,b)=>a+b,0)/vols.slice(0,-1).length);
+    // 连续在关键位“上方”的根数（阻力=站上即看多；支撑=价格本就在其上方）
+    let c=0; for(let i=closes.length-1;i>=0;i--){ if(closes[i]>K) c++; else break; }
+    holdCount=c;
+  }
+  return {avgVol,holdCount};
+}
+
+async function autoConnect(force){
+  const badge=$('srcBadge'),meta=$('liveMeta'),p=$('livePrice');
+  if(force){badge.textContent='刷新中…';badge.className='src-badge';}
+  else{badge.innerHTML='<span class="spinner"></span>连接中…';badge.className='src-badge';}
+  const list=SOURCES[SYM];
+  for(const s of list){
+    try{
+      const r=await s.try();
+      if(r&&r.price){
+        const px=r.price;
+        RAWKLINES=r.data;
+        p.textContent=fmt0(px);
+        p.style.color=px>=K?'var(--bull)':'var(--orange)';
+        badge.textContent='✓ 已连接 '+s.name;badge.className='src-badge on';
+        const t=new Date().toLocaleTimeString();
+        let mt='来源：'+s.name+' · 更新时间 '+t;
+        if(r.change!=null)mt+=' · 24h '+(r.change>=0?'+':'')+r.change.toFixed(2)+'%';
+        if(r.vol!=null)mt+=' · 24h量 '+fmt(r.vol);
+        if(r.note)mt+=' — '+r.note;
+        meta.textContent=mt;
+        setAuto('price',px,'price');
+        setAuto('vol',r.vol!=null?Math.round(r.vol/1000)*1000:null,'vol');
+        if(RAWKLINES) drawKLines(RAWKLINES);
+        recalcLevels(RAWKLINES,px);
+        return true;
+      }
+    }catch(e){}
+  }
+  p.textContent='--';badge.textContent='✗ 全部源不可达';badge.className='src-badge';
+  meta.textContent='网络可能受限。可点击"立即刷新"重试，或手动填写。';
+  // 即使源不可达，也用默认关键位 K 生成支撑/阻力列表，保证始终可点击
+  RAWKLINES=null;
+  recalcLevels(null,null);
+  return false;
+}
+
+// 生成候选位（带评分），分流为支撑/阻力
+function recalcLevels(klines,price){
+  // price 不可用时回退：优先用 keylvl，再退 K —— 保证始终能生成支撑/阻力位
+  let p=price;
+  if(p==null||isNaN(p)) p=parseFloat($('price').value);
+  if(p==null||isNaN(p)) p=parseFloat($('keylvl').value);
+  if(p==null||isNaN(p)) p=K;
+  if(p==null||isNaN(p)||p<=0) return;
+  price=p;
+  const cfg=SYMBOL_CFG[SYM];
+  const add=(type,val,strength,coll)=>{
+    if(val&&val>0){
+      const d=Math.abs(val-price);
+      const dir=val>price?'res':'sup';
+      const key=Math.round(val*100)+'_'+dir;
+      const target=coll(dir);
+      if(target.has(key)){ const e=target.get(key); e.strength+=strength; e.types.add(type); }
+      else target.set(key,{type,val,dist:d,strength,types:new Set([type])});
+    }
+  };
+  const sup=new Map(), res=new Map();
+  const coll=dir=> dir==='res'?res:sup;
+
+  // 1) 整数关口
+  const base=cfg.roundBase;
+  const r1=Math.round(price/base)*base;
+  for(let k=-3;k<=3;k++){ const v=r1+k*base; add('round',v,2,coll); }
+  // 2) 枢轴点
+  if(klines&&klines.length>=2){
+    const last=klines[klines.length-1];
+    const prev=klines[klines.length-2];
+    const H=Math.max(last.close,prev.close), L=Math.min(last.close,prev.close), C=last.close;
+    const pp=(H+L+C)/3;
+    add('pivot',pp,1,coll); add('pivot',2*pp-L,1,coll); add('pivot',2*pp-H,1,coll);
+  }
+  // 3) 近期高低点
+  if(klines&&klines.length>=5){
+    const closes=klines.map(k=>k.close);
+    add('high',Math.max(...closes),3,coll); add('low',Math.min(...closes),3,coll);
+    const rc=closes.slice(-3);
+    add('low',Math.min(...rc),3,coll); add('high',Math.max(...rc),3,coll);
+  }
+
+  const score=(c)=>{
+    const typeW=(c.types.has('high')||c.types.has('low'))?3:(c.types.has('round')?2:1);
+    const multi=(c.strength>=4)?0.5:0;
+    const pct=c.dist/price;
+    let distF; if(pct<0.002)distF=0.3;else if(pct<0.04)distF=1.0;else if(pct<0.08)distF=0.6;else distF=0.2;
+    c.score=typeW+multi+distF;
+    c.typeLabel=c.types.has('high')?'近期高点':(c.types.has('low')?'近期低点':(c.types.has('round')?'整数关口':'枢轴位'));
+    return c;
+  };
+  SUPPORTS=[...sup.values()].map(score).sort((a,b)=>b.score-a.score||a.dist-b.dist).slice(0,6);
+  RESISTANCES=[...res.values()].map(score).sort((a,b)=>b.score-a.score||a.dist-b.dist).slice(0,6);
+
+  drawZones();
+  // 若当前 K 已在某列表，则保持；否则默认选阻力推荐（更贴近“放量站稳”语境）；无阻力则选支撑
+  const curK=Math.round(K*100);
+  if(autoPushed.key){
+    const keep=SUPPORTS.find(L=>Math.round(L.val*100)===curK)||RESISTANCES.find(L=>Math.round(L.val*100)===curK);
+    if(keep) pickLevel(keep,false); else pickDefault();
+  }else{
+    pickDefault();
+  }
+}
+
+function pickDefault(){
+  if(RESISTANCES.length) pickLevel(RESISTANCES[0],false);
+  else if(SUPPORTS.length) pickLevel(SUPPORTS[0],false);
+}
+
+function drawZones(){
+  const sb=$('supList'), rb=$('resList');
+  const curK=Math.round((parseFloat($('keylvl').value)||K)*100);
+  const render=(list,zone,box)=>{
+    box.innerHTML=list.length?'':'<div class="zlvl" style="cursor:default;color:var(--muted);">待识别…</div>';
+    list.forEach((L,idx)=>{
+      const sel=(Math.round(L.val*100)===curK)?'sel':'';
+      const reco=(idx===0)?'<span class="reco">推荐</span>':'';
+      box.insertAdjacentHTML('beforeend',
+        '<div class="zlvl '+sel+'" onclick="pickLevel(LV('+(zone==='sup'?"'SUPPORTS'":"'RESISTANCES'")+','+idx+'),true)">'+
+          reco+'<span class="zb">'+fmt0(L.val)+'</span>'+
+          '<span style="font-size:11px;color:var(--muted);">'+L.typeLabel+'</span>'+
+          '<span class="zm">距现价 '+fmt0(L.dist)+' · '+L.score.toFixed(1)+'分</span>'+
+        '</div>');
+    });
+  };
+  render(SUPPORTS,'sup',sb);
+  render(RESISTANCES,'res',rb);
+}
+function LV(arr,i){ return arr==='SUPPORTS'?SUPPORTS[i]:RESISTANCES[i]; }
+
+function pickLevel(L,lock){
+  if(!L)return;
+  K=L.val;
+  DIR=L.val> (parseFloat($('price').value)||L.val) ? 'res':'sup';
+  $('keylvl').value=K;
+  $('keylvlName').textContent=fmt0(K)+' USD';
+  $('dirName').textContent = DIR==='res'?'阻力位':'支撑位';
+  $('dirbox').value = (DIR==='res'?'阻力 (价格下方)':'支撑 (价格上方)')+' · 看'+ (DIR==='res'?'突破':'守住');
+  if(lock){ autoPushed.key=true; }
+  // 联动重算“连续根数”
+  const st=computeStats();
+  setAuto('holdk',st.holdCount,'hold');
+  setAuto('avgvol',st.avgVol,'avg');
+  drawZones();
+  calc();
+}
+
+function setAuto(id,val,key){
+  const el=$(id),tag=$('tag'+key);
+  const wasAuto=autoPushed[id]===true||el.dataset.auto==='true';
+  if(val==null){ tag.textContent='手动';tag.className='chip manual';el.classList.remove('auto');el.dataset.auto='false';return; }
+  if(autoPushed[id]===true||!el.value||wasAuto){
+    el.value=val;autoPushed[id]=true;el.dataset.auto='true';
+    el.classList.add('auto');tag.textContent='自动';tag.className='chip auto';
+  }else{
+    tag.textContent='手动';tag.className='chip manual';el.classList.remove('auto');el.dataset.auto='false';
+  }
+  el.oninput=()=>onManual(key);
+}
+function onManual(key){
+  autoPushed[key]=false;
+  const id=key==='key'?'keylvl':(key==='price'?'price':(key==='vol'?'vol':(key==='avg'?'avgvol':'holdk')));
+  const el=$(id); if(!el)return;
+  const tag=$('tag'+key); if(tag){tag.textContent='手动';tag.className='chip manual';el.classList.remove('auto');el.dataset.auto='false';}
+  if(key==='key'){ K=parseFloat(el.value)||K; $('keylvlName').textContent=fmt0(K)+' USD'; }
+}
+
+function drawKLines(data){
+  const box=$('klist'); if(!box||!data||!data.length){return;}
+  const recent=data.slice(-10);
+  const cur=data[data.length-1];
+  const min=Math.min(...recent.map(d=>d.close)),max=Math.max(...recent.map(d=>d.close));
+  const span=(max-min)||1;
+  box.innerHTML=recent.map(d=>{
+    const pct=(d.close-min)/span;const w=Math.max(6,(Math.floor(pct*20)*5));
+    const col=d.close>K?'#2fbf7a':'#5a6b8c';
+    const cc=d.time===cur.time?(d.close>K?'var(--bull)':'var(--orange)'):'var(--muted)';
+    const label=(d.time===cur.time?'现':'')+' '+new Date(d.time).toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})+' '+fmt(d.close);
+    return '<div class="krow"><span style="flex:0 0 118px;color:'+cc+';">'+label+'</span>'+
+      '<div class="bar" style="width:120px;background:#232f4a;"><div class="kbar" style="width:'+w+'%;background:'+col+';"></div></div>'+
+      '<span style="font-size:11px;">'+(d.close>K?'≥'+fmt0(K):'<'+fmt0(K))+'</span></div>';
+  }).join('');
+}
+
+// ---------- 判定（多空双向：支撑阻力互换原理） ----------
+function calc(){
+  const price=parseFloat($('price').value);
+  const vol=parseFloat($('vol').value);
+  const avg=parseFloat($('avgvol').value);
+  const holdk=parseInt($('holdk').value);
+  const pull=$('pull').value;
+  K=parseFloat($('keylvl').value)||K;
+
+  // 量比
+  let ratio=0;
+  if(!isNaN(vol)&&!isNaN(avg)&&avg>0){ ratio=vol/avg; }
+  const hasVol=!isNaN(vol)&&!isNaN(avg)&&avg>0;
+
+  // 价格相对关键位：多头区(price>K) / 空头区(price<K)
+  const priceAbove=(!isNaN(price))?price>K:false;   // 现价在关键位上方
+  const inLongZone = priceAbove;                    // 多头区：价格在关键位上方，关键位=支撑
+
+  // 连续根数：价格在关键位上方连续根数
+  const holdOK = priceAbove && holdk>=2;
+
+  // 回踩：多头区才看"回踩守住"，空头区看"遇阻/跌破"
+  const pullStat = inLongZone ? (pull==='yes'?2:(pull==='break'?0:1)) : (pull==='break'?0:1);
+  const pullOK = pullStat===2;
+
+  // ---- 多空强度计算（0~1）----
+  let longScore=0, shortScore=0;
+
+  if(hasVol){
+    if(inLongZone){
+      // 价格在关键位上方：关键位=支撑
+      //   多头=缩量守住/回踩不破；空头=放量跌破
+      const defens = (ratio<=1.0)?1:(ratio<=1.3?0.6:0.3);   // 缩量防守
+      longScore = 0.5*defens + 0.3*(priceAbove?1:0) + 0.2*(pullOK?1:0);
+      const broke = (ratio>=1.5)?1:(ratio>1.3?0.6:0.2);      // 放量跌破
+      shortScore = 0.5*broke + 0.3*(pullStat===0?1:0) + 0.2*(holdk<2?(holdk===1?0.4:0):0);
+    }else{
+      // 价格在关键位下方：关键位=阻力
+      //   多头=放量突破站稳；空头=缩量遇阻
+      const btok = (ratio>=1.5)?1:(ratio>1.2?0.6:0.2);       // 放量突破
+      longScore = 0.5*btok + 0.3*(holdOK?1:0) + 0.2*(pullStat===2?1:(pullStat===1?0.5:0));
+      const reject = (ratio<=0.8)?1:(ratio<=1.0?0.5:0.2);    // 缩量遇阻
+      shortScore = 0.5*reject + 0.3*(!priceAbove?1:0) + 0.2*(holdk<2?(holdk===1?0.3:0):0);
+    }
+  }else{
+    // 无量能：只看位置方向
+    longScore = inLongZone ? (0.5 + 0.3*(pullOK?1:0)) : (0.3*(holdOK?1:0));
+    shortScore = inLongZone ? 0.3 : 0.5;
+  }
+  longScore=Math.min(1,longScore);
+  shortScore=Math.min(1,shortScore);
+
+  // 方向判定
+  let dir='neutral', clsDir;
+  if(longScore>shortScore+0.1){ dir='long'; clsDir='ok'; }
+  else if(shortScore>longScore+0.1){ dir='short'; clsDir='no'; }
+  else { dir='neutral'; clsDir='warn'; }
+
+  // 状态表
+  $('s_vol').textContent=hasVol?('量比 '+ratio.toFixed(2)):'—';
+  $('s_vol').className=hasVol?(ratio>=1.5?'pass':(ratio<=0.8?'fail':'warn')):'warn';
+  $('s_hold').textContent=isNaN(price)||isNaN(holdk)?'—':(holdOK?'✓ 连续站稳':(priceAbove?'✗ 上方但未连续≥2根':'✗ 未在上方'));
+  $('s_hold').className=isNaN(price)||isNaN(holdk)?'warn':(holdOK?'pass':'fail');
+  $('s_pull').textContent=pull;
+  $('s_pull').className=pullStat===2?'pass':(pullStat===0?'fail':'warn');
+
+  // 标题 + 操作建议
+  let title,tips,action;
+  const zoneTxt=inLongZone?('多头区（价格在 '+fmt0(K)+' 上方，该位=支撑）'):('空头区（价格在 '+fmt0(K)+' 下方，该位=阻力）');
+  if(dir==='long'){
+    title='🟢 偏多的信号 —— '+fmt0(K)+' 支撑有效/突破站稳';
+    action='建议：考虑<b style="color:#26d07c;font-size:16px;">做多（买入）</b>';
+    tips=inLongZone?'价格守住 '+fmt0(K)+' 支撑，回踩不破可逢低做多，跌破 '+fmt0(K)+' 止损。':'价格放量突破 '+fmt0(K)+' 阻力，站稳可顺势做多，回踩确认后进场。';
+  }else if(dir==='short'){
+    title='🔴 偏空的信号 —— '+fmt0(K)+' 跌破/遇阻压制';
+    action='建议：考虑<b style="color:#ff5d5d;font-size:16px;">做空（卖出）</b>';
+    tips=inLongZone?'价格放量跌破 '+fmt0(K)+' 支撑（转阻力），反弹可做空，站回 '+fmt0(K)+' 止损。':'价格在 '+fmt0(K)+' 阻力遇阻，缩量回落可做空，突破 '+fmt0(K)+' 止损。';
+  }else{
+    title='⚠️ 方向不明 —— 多空力量均衡，观望';
+    action='建议：<b style="color:#ff9f43;font-size:16px;">观望（暂不进场）</b>';
+    tips='当前 '+zoneTxt+'，多头/空头信号接近。等量能或价格确认方向后再进场。';
+  }
+
+  const banner='<div class="banner '+clsDir+'">'+action+
+    '<div style="font-size:13px;font-weight:700;margin-top:6px;">'+title+'</div>'+
+    '<div style="font-size:12.5px;font-weight:500;margin-top:4px;">'+tips+'</div>'+
+    '<div style="font-size:11.5px;font-weight:400;margin-top:6px;color:var(--muted);">'+zoneTxt+'</div></div>';
+
+  // 多空强度条
+  const meter=(label,score,color)=>{
+    const pct=Math.min(100,Math.max(0,score*100));
+    return '<div class="meter"><div class="lbl">'+label+'</div><div class="bar">'+
+      '<div class="fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
+      '<div class="val" style="color:'+color+'">'+Math.round(pct)+'%</div></div>';
+  };
+  $('output').innerHTML=banner+
+    meter('多头强度',longScore,'#26d07c')+
+    meter('空头强度',shortScore,'#ff5d5d')+
+    '<div class="hint" style="margin-top:12px;font-size:12px;">量比 '+ (hasVol?ratio.toFixed(2):'--') +'（放量突破/跌破 ≥1.5，缩量守住 ≤1.0）· 连续站稳根数 '+(isNaN(holdk)?'--':holdk)+'</div>';
+}
+
+function reset(){
+  autoPushed={};
+  ['price','vol','avgvol','holdk','keylvl'].forEach(id=>$(id).value='');
+  $('pull').value='no';$('output').innerHTML='';
+  ['s_vol','s_hold','s_pull'].forEach(id=>{$(id).textContent='—';$(id).className='warn';});
+  ['price','vol','avg','hold'].forEach(k=>{const t=$('tag'+k);t.textContent='自动';t.className='chip auto';});
+  autoConnect();
+}
+
+switchSym('XAU');
+autoConnect();
+</script>
+</body>
+</html>
